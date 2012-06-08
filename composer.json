@@ -2,7 +2,7 @@
     "type": "library",
     "name": "codealchemy/wisdom",
     "description": "A Symfony Config-based configurationn loader.",
-    "homepage": "http://codealchemy.github.com/Wisdom",
+    "homepage": "http://github.com/codealchemy/Wisdom",
     "license": "MIT",
     "authors": [
         {
