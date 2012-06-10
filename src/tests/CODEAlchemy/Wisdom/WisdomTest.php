@@ -171,7 +171,7 @@
             $this->wisdom->addLoader(new JSON ($this->wisdom->getLocator()));
 
             $this->assertSame($data, $this->wisdom->get(basename($file)));
-            $this->assertSame($data, $this->wisdom->get(basename($file)));
+            $this->assertSame(array($data, $file), $this->wisdom->get(basename($file), true));
             $this->assertTrue(file_exists($file . '.php'));
 
             unlink($file);

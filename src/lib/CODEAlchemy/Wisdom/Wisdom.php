@@ -88,13 +88,19 @@
         }
 
         /**
-         * Returns the data for the configuration file.
+         * Returns the data for the configuration file.  If $path is set to
+         * true, a two element array is returned.  The first value is the data
+         * parsed from the file.  The second value is the file path that the
+         * data was parsed from.
          *
          * @param string $file The configuration file name.
+         * @param boolean $path Return the file path too?
          * @return mixed The configuration file data.
          */
-        public function get($file)
+        public function get($file, $path = false)
         {
+            $found = $this->locator->locate($file);
+
             if ($this->isCache())
             {
                 $cache = new ConfigCache(
@@ -104,6 +110,11 @@
 
                 if ($cache->isFresh())
                 {
+                    if ($path)
+                    {
+                        return array(include $cache, $found);
+                    }
+
                     return include $cache;
                 }
             }
@@ -115,8 +126,6 @@
                 );
             }
 
-            $found = $this->locator->locate($file);
-
             $data = $loader->load($found);
 
             if ($this->isCache())
@@ -125,6 +134,11 @@
                     '<?php return ' . var_export($data, true) . ';',
                     array(new FileResource($found))
                 );
+            }
+
+            if ($path)
+            {
+                return array($data, $path);
             }
 
             return $data;
