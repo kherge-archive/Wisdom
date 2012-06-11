@@ -11,11 +11,9 @@
 
     namespace CODEAlchemy\Wisdom\Silex;
 
-    use CODEAlchemy\Wisdom\Config\FileLocator,
-        CODEAlchemy\Wisdom\Wisdom,
+    use CODEAlchemy\Wisdom\Wisdom,
         Silex\Application,
-        Silex\ServiceProviderInterface,
-        Symfony\Component\Config\Loader\LoaderResolver;
+        Silex\ServiceProviderInterface;
 
     /**
      * A Silex service provider for Wisdom.
