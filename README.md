@@ -6,56 +6,73 @@ Symfony Config for the rest of us.
 
 ## What is it?
 
-Wisdom is a configuration manager based on [Symfony's][Symfony] [Config][Config] component. A service provider is included for integration into a [Silex][Silex]-based web application.
+Wisdom is a library for retrieving configuration data from files.  The library relies on the [Symfony][Symfony] [Config][Config] component to find the files and cache the parsed results.  A service provider for [Silex][Silex] is also included.
 
 ## How do I install it?
 
-Wisdom is designed to be installed with [Composer][Composer].  To add Wisdom to your composer package, you will want to merge this in with your `composer.json` file:
+The library is a [Composer][Composer] package.  To install it, you will want to add the following information to your `composer.json` file:
 
     {
         "require": {
-            "codealchemy/wisdom": "1.*"
+            "codealchemy/wisdom": "1.0.*"
         }
     }
 
-If you choose to not use Composer, the library also conforms to the [PSR-0][PSR0] standard.  This means you can easily load the Wisdom classes on demand using any PSR-0 compliant class loader.
+If you are not using Composer, you may simply clone it using Git.  The library follows the [PSR-0][PSR0] standard, making it compatible with any PSR-0 compliant class loader.
 
 ## How do I use it?
+
+The quickest way to setup Wisdom is this:
 
     use CODEAlchemy\Wisdom\Loader\INI,
         CODEAlchemy\Wisdom\Wisdom;
 
-    $wisdom = new Wisdom ('/path/to/config/');
+    $wisdom = new Wisdom('/path/to/config');
 
-    // Add support for INI files
-    $wisdom->addLoader(new INI($wisdom->getLocator());
+    $wisdom->addLoader(new INI($wisdom->getLoader()));
 
-    $myData = $wisdom->get('myConfig.ini');
+    $settings = $wisdom->get('mySettings.ini');
 
-You may add directory paths when needed
+This example will load any INI configuration files from the `/path/to/config` directory.  To enable caching, support for additional loaders, and more, I advise that you read the API documentation.
 
-    $wisdom->addPath('/another/path');
+### Enabling caching
 
-And you may also add new loaders when needed
+    $wisdom->setCachePath('/path/to/cache/dir');
 
-    $wisdom->addLoader(new JSON($wisdom->getLocator()));
+Conditions for when the cache is refreshed (set by the `Symfony\Component\Config\ConfigCache` class):
 
-## What loaders can I use?
+- The cache file does not exist
+- Debugging is enabled
+    - The original file has been updated
 
-You can use any class that implements [`LoaderInterface`][LoaderInterface].  By default, no loaders are setup, so you will need to add the ones you need.  Wisdom has a few loaders bundled to support the following data formats:
+### Supporting other formats
 
-- INI
-- JSON
-- YAML (requires Symfony's [YAML][YAML] component)
+Wisdom has loaders for INI, JSON, and YAML files:
+
+    CODEAlchemy\Wisdom\Loader\INI
+    CODEAlchemy\Wisdom\Loader\JSON
+    CODEAlchemy\Wisdom\Loader\YAML
+
+> Note that in order to use the included YAML loader, you will need to have the Symfony [YAML][YAML] component installed.
+
+To register one of these loaders, you call the `addLoader()` method:
+
+    $wisdom->addLoader(new JSON($wisdom->getLocator());
+
+The `getLocator()` method is the `FileLocator` instance used by Wisdom to manage configuration directory paths.  It is advised that you use the one provided by Wisdom instead of creating your own.  To support other data formats, you can create your own loader by implementing `Symfony\Component\Config\Loader\LoaderInterface` and register it the same way.
 
 ## How do I integrate it with Silex?
 
-Integration with Silex is accomplished using the bundled service provider.  All that is required is that you specify what directory path(s) to use for locating configuration files.  You may also specificy some options, by the default values are shown below.
+Integration with Silex can be done using the bundled service provider.  All that is required is that you specify what directory path(s) to use for locating files.  There are optional settings you can specify, of which their defaults are shown below.
 
     use CODEAlchemy\Wisdom\Silex\Provider as WisdomProvider;
 
     $app->register(new WisdomProvider, array(
+
+        // required
         'wisdom.path' => '/path/to/config', // or array of paths
+
+        // all optional
         'wisdom.options' => array(
             'cache_path' => '',
             'debug' => $app['debug'],
@@ -73,3 +90,4 @@ Integration with Silex is accomplished using the bundled service provider.  All 
 [PSR0]: https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-0.md
 [Silex]: http://silex.sensiolabs.org/
 [LoaderInterface]: https://github.com/symfony/Config/blob/master/Loader/LoaderInterface.php
+[YAML]: http://symfony.com/doc/current/components/yaml.html
