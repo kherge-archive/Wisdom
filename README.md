@@ -88,7 +88,7 @@ Integration with Silex can be done using the bundled service provider.  All that
 [Config]: http://github.com/symfony/Config
 [Composer]: http://getcomposer.org/
 [PSR0]: https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-0.md
-[API]: http://codealchemy.github.com/Wisdom/api
+[API]: http://codealchemy.github.com/Wisdom/api/
 [Silex]: http://silex.sensiolabs.org/
 [LoaderInterface]: https://github.com/symfony/Config/blob/master/Loader/LoaderInterface.php
 [YAML]: http://symfony.com/doc/current/components/yaml.html
