@@ -11,7 +11,9 @@
 
     namespace CODEAlchemy\Wisdom;
 
-    use CODEAlchemy\Wisdom\Config\FileLocator,
+    use ArrayAccess,
+        CODEAlchemy\Wisdom\Config\FileLocator,
+        CODEAlchemy\Wisdom\Loader\ReplaceInterface,
         InvalidArgumentException,
         RuntimeException,
         Symfony\Component\Config\ConfigCache,
@@ -55,6 +57,13 @@
         private $resolver;
 
         /**
+         * The default replacement values.
+         *
+         * @type array|ArrayAccess
+         */
+        private $values;
+
+        /**
          * Initializes the dependencies.
          *
          * @param array|string $paths The directory paths.
@@ -84,6 +93,13 @@
          */
         public function addLoader(LoaderInterface $loader)
         {
+            if (false === ($loader instanceof ReplaceInterface))
+            {
+                throw new InvalidArgumentException(
+                    "The loader does not implement ReplaceInterface."
+                );
+            }
+
             $this->resolver->addLoader($loader);
         }
 
@@ -95,10 +111,26 @@
          *
          * @param string $file The configuration file name.
          * @param boolean $path Return the file path too?
+         * @param array $values The replacement values.
          * @return mixed The configuration file data.
          */
-        public function get($file, $path = false)
+        public function get($file, $path = false, $values = null)
         {
+            if (isset($values))
+            {
+                if (! (is_array($values) || ($values instanceof ArrayAccess)))
+                {
+                    throw new InvalidArgumentException(
+                        'The $values argument is not an array or implements ArrayAccess.'
+                    );
+                }
+            }
+
+            else
+            {
+                $values = $this->values;
+            }
+
             $found = $this->locator->locate($file);
 
             if ($this->isCache())
@@ -126,7 +158,11 @@
                 );
             }
 
+            $loader->setReplacementValues($values);
+
             $data = $loader->load($found);
+
+            $loader->removeReplacementValues();
 
             if ($this->isCache())
             {
@@ -138,7 +174,7 @@
 
             if ($path)
             {
-                return array($data, $path);
+                return array($data, $found);
             }
 
             return $data;
@@ -182,6 +218,16 @@
         public function getPaths()
         {
             return $this->locator->getPaths();
+        }
+
+        /**
+         * Returns the default replacement values.
+         *
+         * @return array|ArrayAccess The replacement values.
+         */
+        public function getReplacementValues()
+        {
+            return $this->values;
         }
 
         /**
@@ -248,5 +294,25 @@
         public function setDebug($debug)
         {
             $this->debug = $debug;
+        }
+
+        /**
+         * Sets the default replacement values.
+         *
+         * @param array|ArrayAccess $values The replacement values.
+         */
+        public function setReplacementValues($values)
+        {
+            if (null !== $values)
+            {
+                if (! (is_array($values) || ($values instanceof ArrayAccess)))
+                {
+                    throw new InvalidArgumentException(
+                        'The $values argument is not an array or implements ArrayAccess.'
+                    );
+                }
+            }
+
+            $this->values = $values;
         }
     }

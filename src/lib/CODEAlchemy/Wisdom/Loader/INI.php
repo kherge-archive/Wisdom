@@ -11,20 +11,28 @@
 
     namespace CODEAlchemy\Wisdom\Loader;
 
-    use RuntimeException,
-        Symfony\Component\Config\Loader\FileLoader;
+    use RuntimeException;
 
     /**
      * Wisdom support for INI files.
      *
      * @author Kevin Herrera <kherrera@codealchemy.com>
      */
-    class INI extends FileLoader
+    class INI extends ReplaceAbstract
     {
         /** {@inheritDoc} */
         public function load($resource, $type = null)
         {
-            if (false === ($data = parse_ini_file($resource, true)))
+            if (false === ($data = file_get_contents($resource)))
+            {
+                throw new RuntimeException(
+                    "Unable to read file: $resource"
+                );
+            }
+
+            $data = $this->doReplacements($data);
+
+            if (false === ($data = parse_ini_string($data, true)))
             {
                 throw new RuntimeException(
                     "Unable to parse file: $resource"

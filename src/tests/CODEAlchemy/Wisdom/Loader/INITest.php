@@ -53,11 +53,24 @@ INI
 
         /**
          * @expectedException RuntimeException
-         * @expectedExceptionMessage Unable to parse file:
+         * @expectedExceptionMessage Unable to read file:
          */
         public function testLoadFail()
         {
             @ $this->loader->load('/fake/path');
+        }
+
+        /**
+         * @expectedException RuntimeException
+         * @expectedExceptionMessage Unable to parse file:
+         */
+        public function testLoadParseFail()
+        {
+            $file = tempnam(sys_get_temp_dir(), 'ini');
+
+            file_put_contents($file, 'test[test][test] = fail');
+
+            @ $this->loader->load($file);
         }
 
         public function testSupports()

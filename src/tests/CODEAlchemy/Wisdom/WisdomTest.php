@@ -16,6 +16,7 @@
         CODEAlchemy\Wisdom\Loader\JSON,
         CODEAlchemy\Wisdom\Loader\YAML,
         PHPUnit_Framework_TestCase,
+        Symfony\Component\Config\Loader\DelegatingLoader,
         Symfony\Component\Config\Loader\LoaderResolver;
 
     class WisdomTest extends PHPUnit_Framework_TestCase
@@ -46,6 +47,11 @@
                 array(),
                 $this->wisdom->getLoaders()
             );
+        }
+
+        public function testGetReplacementValues()
+        {
+            $this->assertNull($this->wisdom->getReplacementValues());
         }
 
         public function testIsCache()
@@ -88,6 +94,15 @@
             $this->wisdom->addLoader($loader);
 
             $this->assertSame(array($loader), $this->wisdom->getLoaders());
+        }
+
+        /**
+         * @expectedException InvalidArgumentException
+         * @expectedExceptionMessage The loader does not implement ReplaceInterface.
+         */
+        public function testAddLoaderFail()
+        {
+            $this->wisdom->addLoader(new DelegatingLoader (new LoaderResolver));
         }
 
         /**
@@ -141,6 +156,25 @@
         }
 
         /**
+         * @depends testGetReplacementValues
+         */
+        public function testSetReplacementValues()
+        {
+            $this->wisdom->setReplacementValues($values = array(rand()));
+
+            $this->assertSame($values, $this->wisdom->getReplacementValues());
+        }
+
+        /**
+         * @expectedException InvalidArgumentException
+         * @expectedExceptionMessage The $values argument is not an array or implements ArrayAccess.
+         */
+        public function testSetReplacementValuesInvalid()
+        {
+            $this->wisdom->setReplacementValues('test');
+        }
+
+        /**
          * @depends testIsCache
          * @depends testSetCachePath
          * @depends testSetDebug
@@ -170,11 +204,25 @@
             $this->wisdom->setCachePath(sys_get_temp_dir());
             $this->wisdom->addLoader(new JSON ($this->wisdom->getLocator()));
 
+            $this->assertSame(array($data, $file), $this->wisdom->get(basename($file), true, array()));
+
+            unlink($file . '.php');
+
             $this->assertSame($data, $this->wisdom->get(basename($file)));
-            $this->assertSame(array($data, $file), $this->wisdom->get(basename($file), true));
+            $this->assertSame($data, $this->wisdom->get(basename($file)));
+            $this->assertSame(array($data, $file), $this->wisdom->get(basename($file), true, array()));
             $this->assertTrue(file_exists($file . '.php'));
 
             unlink($file);
+        }
+
+        /**
+         * @expectedException InvalidArgumentException
+         * @expectedExceptionMessage The $values argument is not an array or implements ArrayAccess.
+         */
+        public function testGetInvalidValues()
+        {
+            $this->wisdom->get(null, null, 'test');
         }
 
         /**

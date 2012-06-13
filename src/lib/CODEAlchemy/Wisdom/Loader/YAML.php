@@ -11,7 +11,7 @@
 
     namespace CODEAlchemy\Wisdom\Loader;
 
-    use Symfony\Component\Config\Loader\FileLoader,
+    use RuntimeException,
         Symfony\Component\Yaml\Yaml as _Yaml;
 
     /**
@@ -19,12 +19,19 @@
      *
      * @author Kevin Herrera <kherrera@codealchemy.com>
      */
-    class YAML extends FileLoader
+    class YAML extends ReplaceAbstract
     {
         /** {@inheritDoc} */
         public function load($resource, $type = null)
         {
-            return _Yaml::parse($resource);
+            if (false === ($data = file_get_contents($resource)))
+            {
+                throw new RuntimeException(
+                    "Unable to read file: $resource"
+                );
+            }
+
+            return _Yaml::parse($this->doReplacements($data));
         }
 
         /** {@inheritDoc} */

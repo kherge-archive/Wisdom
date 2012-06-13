@@ -49,6 +49,8 @@
             {
                 $wisdom = new Wisdom($app['wisdom.path']);
 
+                $wisdom->setReplacementValues($app);
+
                 foreach ((array) $app['wisdom.options']['loader'] as $class)
                 {
                     $wisdom->addLoader(new $class ($wisdom->getLocator()));

@@ -11,15 +11,14 @@
 
     namespace CODEAlchemy\Wisdom\Loader;
 
-    use RuntimeException,
-        Symfony\Component\Config\Loader\FileLoader;
+    use RuntimeException;
 
     /**
      * Wisdom support for JSON files.
      *
      * @author Kevin Herrera <kherrera@codealchemy.com>
      */
-    class JSON extends FileLoader
+    class JSON extends ReplaceAbstract
     {
         /**
          * Returns the error message for the JSON error code.
@@ -49,7 +48,7 @@
                 throw new RuntimeException("Unable to read file: $resource");
             }
 
-            $data = json_decode($data, true);
+            $data = json_decode($this->doReplacements($data), true);
 
             if (JSON_ERROR_NONE !== ($code = json_last_error()))
             {

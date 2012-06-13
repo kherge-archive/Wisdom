@@ -49,6 +49,15 @@
         }
 
         /**
+         * @expectedException RuntimeException
+         * @expectedExceptionMessage Unable to read file:
+         */
+        public function testLoadReadFail()
+        {
+            @ $this->loader->load('/fake/file');
+        }
+
+        /**
          * @expectedException Symfony\Component\Yaml\Exception\ParseException
          */
         public function testLoadFail()
