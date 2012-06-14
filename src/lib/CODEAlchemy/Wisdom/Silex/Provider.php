@@ -38,7 +38,8 @@
                         'CODEAlchemy\Wisdom\Loader\INI',
                         'CODEAlchemy\Wisdom\Loader\JSON',
                         'CODEAlchemy\Wisdom\Loader\YAML'
-                    )
+                    ),
+                    'prefix' => $app['debug'] ? 'dev.' : 'prod.'
                 ),
                 isset($app['wisdom.options'])
                     ? $app['wisdom.options']
@@ -58,6 +59,7 @@
 
                 $wisdom->setCachePath($app['wisdom.options']['cache_path']);
                 $wisdom->setDebug($app['wisdom.options']['debug']);
+                $wisdom->setFilePrefix($app['wisdom.options']['prefix']);
 
                 return $wisdom;
             });

@@ -53,7 +53,8 @@
                         'CODEAlchemy\Wisdom\Loader\INI',
                         'CODEAlchemy\Wisdom\Loader\JSON',
                         'CODEAlchemy\Wisdom\Loader\YAML'
-                    )
+                    ),
+                    'prefix' => 'prod.'
                 ),
                 $this->app['wisdom.options']
             );
@@ -77,5 +78,6 @@
             $this->assertSame($locator, $this->app['wisdom']->getLocator());
             $this->assertSame($this->app['wisdom.options']['cache_path'], $this->app['wisdom']->getCachePath());
             $this->assertSame($this->app['wisdom.options']['debug'], $this->app['wisdom']->isDebug());
+            $this->assertEquals($this->app['wisdom.options']['prefix'], $this->app['wisdom']->getFilePrefix());
         }
     }
