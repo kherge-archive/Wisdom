@@ -50,6 +50,13 @@
         private $locator;
 
         /**
+         * The file prefix.
+         *
+         * @type string
+         */
+        private $prefix = '';
+
+        /**
          * The LoaderResolver instance.
          *
          * @type LoaderResolver
@@ -131,7 +138,23 @@
                 $values = $this->values;
             }
 
-            $found = $this->locator->locate($file);
+            try
+            {
+                $found = $this->locator->locate($this->prefix . $file);
+            }
+
+            catch (InvalidArgumentException $first)
+            {
+                try
+                {
+                    $found = $this->locator->locate($file);
+                }
+
+                catch (InvalidArgumentException $second)
+                {
+                    throw $first;
+                }
+            }
 
             if ($this->isCache())
             {
@@ -221,6 +244,16 @@
         }
 
         /**
+         * Returns the file prefix.
+         *
+         * @return string The file prefix.
+         */
+        public function getFilePrefix()
+        {
+            return $this->prefix;
+        }
+
+        /**
          * Returns the default replacement values.
          *
          * @return array|ArrayAccess The replacement values.
@@ -294,6 +327,16 @@
         public function setDebug($debug)
         {
             $this->debug = $debug;
+        }
+
+        /**
+         * Sets the file prefix.
+         *
+         * @param string $prefix The file prefix.
+         */
+        public function setFilePrefix($prefix)
+        {
+            $this->prefix = $prefix;
         }
 
         /**

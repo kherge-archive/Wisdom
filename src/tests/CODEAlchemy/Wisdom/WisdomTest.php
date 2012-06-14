@@ -49,6 +49,11 @@
             );
         }
 
+        public function testGetPrefix()
+        {
+            $this->assertSame('', $this->wisdom->getFilePrefix());
+        }
+
         public function testGetReplacementValues()
         {
             $this->assertNull($this->wisdom->getReplacementValues());
@@ -156,6 +161,16 @@
         }
 
         /**
+         * @depends testGetPrefix
+         */
+        public function testSetPrefix()
+        {
+            $this->wisdom->setFilePrefix('test.');
+
+            $this->assertEquals('test.', $this->wisdom->getFilePrefix());
+        }
+
+        /**
          * @depends testGetReplacementValues
          */
         public function testSetReplacementValues()
@@ -201,8 +216,9 @@
             );
 
             $this->wisdom->addPath(dirname($file));
-            $this->wisdom->setCachePath(sys_get_temp_dir());
             $this->wisdom->addLoader(new JSON ($this->wisdom->getLocator()));
+            $this->wisdom->setCachePath(sys_get_temp_dir());
+            $this->wisdom->setFilePrefix('test.');
 
             $this->assertSame(array($data, $file), $this->wisdom->get(basename($file), true, array()));
 
@@ -214,6 +230,17 @@
             $this->assertTrue(file_exists($file . '.php'));
 
             unlink($file);
+        }
+
+        /**
+         * @expectedException InvalidArgumentException
+         * @expectedExceptionMessage The file "test.test.yml" does not exist (in: ).
+         */
+        public function testGetNotExist()
+        {
+            $this->wisdom->setFilePrefix('test.');
+
+            $this->wisdom->get('test.yml');
         }
 
         /**
