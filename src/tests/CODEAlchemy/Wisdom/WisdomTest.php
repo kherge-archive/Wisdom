@@ -233,6 +233,42 @@
         }
 
         /**
+         * @depends testGet
+         */
+        public function testGetWithPrefix()
+        {
+            unlink($file = tempnam(sys_get_temp_dir(), 'wis'));
+
+            $file = dirname($file) . '/test.' . basename($file);
+            $data = array(
+                'category' => array(
+                    'test' => 'My value.',
+                    'another' => array(
+                        'One',
+                        'Two',
+                        'Three'
+                    )
+                ),
+                'rand' => rand()
+            );
+
+            file_put_contents(
+                $file .= '.json',
+                utf8_encode(json_encode($data))
+            );
+
+            $this->wisdom->addPath(dirname($file));
+            $this->wisdom->addLoader(new JSON ($this->wisdom->getLocator()));
+            $this->wisdom->setCachePath(sys_get_temp_dir());
+            $this->wisdom->setFilePrefix('test.');
+
+            $this->assertSame(array($data, $file), $this->wisdom->get(basename($file), true, array()));
+            $this->assertTrue(file_exists($file . '.php'));
+
+            unlink($file);
+        }
+
+        /**
          * @expectedException InvalidArgumentException
          * @expectedExceptionMessage The file "test.test.yml" does not exist (in: ).
          */

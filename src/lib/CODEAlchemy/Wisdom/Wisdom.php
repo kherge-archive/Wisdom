@@ -156,6 +156,11 @@
                 }
             }
 
+            if (false === isset($first))
+            {
+                $file = $this->prefix . $file;
+            }
+
             if ($this->isCache())
             {
                 $cache = new ConfigCache(
