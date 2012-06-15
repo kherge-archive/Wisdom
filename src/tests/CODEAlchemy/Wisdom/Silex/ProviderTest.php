@@ -45,6 +45,10 @@
                 'wisdom.path' => __DIR__
             ));
 
+            $this->assertSame(array(), $this->app['wisdom.options']);
+
+            $locator = $this->app['wisdom']->getLocator();
+
             $this->assertSame(
                 array(
                     'cache_path' => '',
@@ -58,8 +62,6 @@
                 ),
                 $this->app['wisdom.options']
             );
-
-            $locator = $this->app['wisdom']->getLocator();
 
             $this->assertEquals(
                 array(__DIR__),
@@ -79,5 +81,31 @@
             $this->assertSame($this->app['wisdom.options']['cache_path'], $this->app['wisdom']->getCachePath());
             $this->assertSame($this->app['wisdom.options']['debug'], $this->app['wisdom']->isDebug());
             $this->assertEquals($this->app['wisdom.options']['prefix'], $this->app['wisdom']->getFilePrefix());
+        }
+
+        /**
+         * @depends testRegister
+         */
+        public function testUse()
+        {
+            unlink($dir = tempnam(sys_get_temp_dir(), 'wis'));
+
+            mkdir($dir);
+
+            file_put_contents($dir . '/test.ini', <<<INI
+my = "value"
+INI
+            );
+
+            $this->app->register($this->provider, array(
+                'wisdom.path' => $dir,
+                'wisdom.options' => array(
+                    'cache_path' => $dir
+                )
+            ));
+
+            $settings = $this->app['wisdom']->get('test.ini');
+
+            $this->assertEquals('value', $settings['my']);
         }
     }

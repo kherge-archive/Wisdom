@@ -30,24 +30,24 @@
         /** {@inheritDoc} */
         public function register(Application $app)
         {
-            $app['wisdom.options'] = array_merge(
-                array(
-                    'cache_path' => '',
-                    'debug' => $app['debug'],
-                    'loader' => array(
-                        'CODEAlchemy\Wisdom\Loader\INI',
-                        'CODEAlchemy\Wisdom\Loader\JSON',
-                        'CODEAlchemy\Wisdom\Loader\YAML'
-                    ),
-                    'prefix' => $app['debug'] ? 'dev.' : 'prod.'
-                ),
-                isset($app['wisdom.options'])
-                    ? $app['wisdom.options']
-                    : array()
-            );
+            $app['wisdom.options'] = array();
 
             $app['wisdom'] = $app->share(function() use ($app)
             {
+                $app['wisdom.options'] = array_merge(
+                    array(
+                        'cache_path' => '',
+                        'debug' => $app['debug'],
+                        'loader' => array(
+                            'CODEAlchemy\Wisdom\Loader\INI',
+                            'CODEAlchemy\Wisdom\Loader\JSON',
+                            'CODEAlchemy\Wisdom\Loader\YAML'
+                        ),
+                        'prefix' => $app['debug'] ? 'dev.' : 'prod.'
+                    ),
+                    $app['wisdom.options']
+                );
+
                 $wisdom = new Wisdom($app['wisdom.path']);
 
                 $wisdom->setReplacementValues($app);
