@@ -6,7 +6,7 @@ Symfony Config for the rest of us.
 
 ## Installing
 
-The install Wisdom, you must add it to the list of dependencies in your [`composer.json`][Composer] file.
+To install Wisdom, you must add it to the list of dependencies in your [`composer.json`][Composer] file.
 
     {
         "require": {
