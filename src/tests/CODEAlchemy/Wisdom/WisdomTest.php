@@ -11,284 +11,198 @@
 
     namespace CODEAlchemy\Wisdom;
 
-    use CODEAlchemy\Wisdom\Config\FileLocator,
+    use ArrayObject,
         CODEAlchemy\Wisdom\Loader\INI,
-        CODEAlchemy\Wisdom\Loader\JSON,
         CODEAlchemy\Wisdom\Loader\YAML,
         PHPUnit_Framework_TestCase,
-        Symfony\Component\Config\Loader\DelegatingLoader,
-        Symfony\Component\Config\Loader\LoaderResolver;
+        ReflectionClass;
 
     class WisdomTest extends PHPUnit_Framework_TestCase
     {
-        private $wisdom;
-
-        protected function setUp()
+        public function testConstruct()
         {
-            $this->wisdom = new Wisdom;
+            $wisdom = new Wisdom(__DIR__);
+
+            $locator = $this->getProperty($wisdom, 'locator');
+
+            $this->assertEquals(array(__DIR__), $this->getProperty($locator, 'paths'));
         }
 
-        public function testGetCachePath()
-        {
-            $this->assertSame('', $this->wisdom->getCachePath());
-        }
-
-        public function testGetPaths()
-        {
-            $this->assertSame(
-                array(),
-                $this->wisdom->getPaths()
-            );
-        }
-
-        public function testGetLoaders()
-        {
-            $this->assertSame(
-                array(),
-                $this->wisdom->getLoaders()
-            );
-        }
-
-        public function testGetPrefix()
-        {
-            $this->assertSame('', $this->wisdom->getFilePrefix());
-        }
-
-        public function testGetReplacementValues()
-        {
-            $this->assertNull($this->wisdom->getReplacementValues());
-        }
-
-        public function testIsCache()
-        {
-            $this->assertFalse($this->wisdom->isCache());
-        }
-
-        public function testIsDebug()
-        {
-            $this->assertFalse($this->wisdom->isDebug());
-        }
-
-        /**
-         * @depends testGetLoaders
-         * @depends testGetPaths
-         * @depends testIsDebug
-         */
-        public function testConstructor()
-        {
-            $paths = __DIR__;
-
-            $loaders = array(
-                new INI(new FileLocator),
-                new JSON(new FileLocator)
-            );
-
-            $this->wisdom = new Wisdom($paths, $loaders);
-
-            $this->assertSame(array($paths), $this->wisdom->getPaths());
-            $this->assertSame($loaders, $this->wisdom->getLoaders());
-        }
-
-        /**
-         * @depends testGetLoaders
-         */
-        public function testAddLoader()
-        {
-            $loader = new INI($this->wisdom->getLocator());
-
-            $this->wisdom->addLoader($loader);
-
-            $this->assertSame(array($loader), $this->wisdom->getLoaders());
-        }
-
-        /**
-         * @depends testGetPaths
-         */
         public function testAddPath()
         {
-            $this->wisdom->addPath(__DIR__);
+            $wisdom = new Wisdom;
 
-            $this->assertSame(array(__DIR__), $this->wisdom->getPaths());
+            $wisdom->addPath(__DIR__);
+
+            $locator = $this->getProperty($wisdom, 'locator');
+
+            $this->assertEquals(array(__DIR__), $this->getProperty($locator, 'paths'));
         }
 
-        /**
-         * @depends testGetCachePath
-         * @depends testIsCache
-         */
-        public function testSetCachePath()
+        public function testAddLoader()
         {
-            $this->wisdom->setCachePath(__DIR__);
+            $wisdom = new Wisdom;
 
-            $this->assertEquals(__DIR__, $this->wisdom->getCachePath());
-            $this->assertTrue($this->wisdom->isCache());
+            $loader = new INI;
+
+            $wisdom->addLoader($loader);
+
+            $this->assertSame($this->getProperty($wisdom, 'locator'), $this->getProperty($wisdom, 'locator'));
+            $this->assertSame(array($loader), $this->getProperty($this->getProperty($wisdom, 'resolver'), 'loaders'));
         }
 
-        /**
-         * @expectedException InvalidArgumentException
-         * @expectedExceptionMessage The cache path is not a directory:
-         */
-        public function testSetCachePathInvalid()
+        public function testSetCache()
         {
-            $this->wisdom->setCachePath(tempnam(sys_get_temp_dir(), 'wis'));
+            $wisdom = new Wisdom;
+
+            $wisdom->setCache(__DIR__);
+
+            $this->assertEquals(__DIR__, $this->getProperty($wisdom, 'cache'));
         }
 
-        /**
-         * @expectedException RuntimeException
-         * @expectedExceptionMessage Unable to create cache directory:
-         */
-        public function testSetCachePathFail()
-        {
-            @ $this->wisdom->setCachePath(tempnam(sys_get_temp_dir(), 'wis') . '/test');
-        }
-
-        /**
-         * @depends testIsDebug
-         */
         public function testSetDebug()
         {
-            $this->wisdom->setDebug(true);
+            $wisdom = new Wisdom;
 
-            $this->assertTrue($this->wisdom->isDebug());
+            $wisdom->setDebug(true);
+
+            $this->assertTrue($this->getProperty($wisdom, 'debug'));
         }
 
-        /**
-         * @depends testGetPrefix
-         */
         public function testSetPrefix()
         {
-            $this->wisdom->setFilePrefix('test.');
+            $wisdom = new Wisdom;
 
-            $this->assertEquals('test.', $this->wisdom->getFilePrefix());
+            $wisdom->setPrefix('test.');
+
+            $this->assertEquals('test.', $this->getProperty($wisdom, 'prefix'));
         }
 
-        /**
-         * @depends testGetReplacementValues
-         */
-        public function testSetReplacementValues()
+        public function testSetValues()
         {
-            $this->wisdom->setReplacementValues($values = array(rand()));
+            $wisdom = new Wisdom;
 
-            $this->assertSame($values, $this->wisdom->getReplacementValues());
+            $array = array('rand' => rand());
+
+            $wisdom->setValues($array);
+
+            $this->assertSame($array, $this->getProperty($wisdom, 'values'));
+
+            $object = new ArrayObject(array('rand' => rand()));
+
+            $wisdom->setValues($object);
+
+            $this->assertSame($object, $this->getProperty($wisdom, 'values'));
         }
 
         /**
          * @expectedException InvalidArgumentException
-         * @expectedExceptionMessage The $values argument is not an array or implements ArrayAccess.
+         * @expectedExceptionMessage The value of $values is not an array or an instance of ArrayAccess.
          */
-        public function testSetReplacementValuesInvalid()
+        public function testSetValuesBadType()
         {
-            $this->wisdom->setReplacementValues('test');
+            $wisdom = new Wisdom;
+
+            $wisdom->setValues(true);
         }
 
         /**
-         * @depends testIsCache
-         * @depends testSetCachePath
-         * @depends testSetDebug
+         * @depends testAddLoader
+         * @depends testSetCache
          */
         public function testGet()
         {
-            unlink($file = tempnam(sys_get_temp_dir(), 'wis'));
+            unlink($dir = tempnam(sys_get_temp_dir(), 'wis'));
 
-            $data = array(
-                'category' => array(
-                    'test' => 'My value.',
-                    'another' => array(
-                        'One',
-                        'Two',
-                        'Three'
-                    )
-                ),
-                'rand' => rand()
+            mkdir($dir);
+
+            file_put_contents($dir . '/test.yml', <<<YAML
+rand: %rand%
+YAML
             );
 
-            file_put_contents(
-                $file .= '.json',
-                utf8_encode(json_encode($data))
-            );
+            $wisdom = new Wisdom($dir);
 
-            $this->wisdom->addPath(dirname($file));
-            $this->wisdom->addLoader(new JSON ($this->wisdom->getLocator()));
-            $this->wisdom->setCachePath(sys_get_temp_dir());
-            $this->wisdom->setFilePrefix('test.');
+            $wisdom->addLoader(new YAML);
+            $wisdom->setCache($dir);
+            $wisdom->setPrefix('test.');
+            $wisdom->setValues(array('rand' => $rand = rand()));
 
-            $this->assertSame(array($data, $file), $this->wisdom->get(basename($file), true, array()));
-
-            unlink($file . '.php');
-
-            $this->assertSame($data, $this->wisdom->get(basename($file)));
-            $this->assertSame($data, $this->wisdom->get(basename($file)));
-            $this->assertSame(array($data, $file), $this->wisdom->get(basename($file), true, array()));
-            $this->assertTrue(file_exists($file . '.php'));
-
-            unlink($file);
-        }
-
-        /**
-         * @depends testGet
-         */
-        public function testGetWithPrefix()
-        {
-            unlink($file = tempnam(sys_get_temp_dir(), 'wis'));
-
-            $file = dirname($file) . '/test.' . basename($file);
-            $data = array(
-                'category' => array(
-                    'test' => 'My value.',
-                    'another' => array(
-                        'One',
-                        'Two',
-                        'Three'
-                    )
-                ),
-                'rand' => rand()
-            );
-
-            file_put_contents(
-                $file .= '.json',
-                utf8_encode(json_encode($data))
-            );
-
-            $this->wisdom->addPath(dirname($file));
-            $this->wisdom->addLoader(new JSON ($this->wisdom->getLocator()));
-            $this->wisdom->setCachePath(sys_get_temp_dir());
-            $this->wisdom->setFilePrefix('test.');
-
-            $this->assertSame(array($data, $file), $this->wisdom->get(basename($file), true, array()));
-            $this->assertTrue(file_exists($file . '.php'));
-
-            unlink($file);
+            $this->assertSame(array('rand' => $rand), $wisdom->get('test.yml'));
+            $this->assertSame(array('rand' => $rand), $wisdom->get('test.yml'));
         }
 
         /**
          * @expectedException InvalidArgumentException
-         * @expectedExceptionMessage The file "test.test.yml" does not exist (in: ).
+         * @expectedExceptionMessage The value of $values is not an array or an instance of ArrayAccess.
          */
-        public function testGetNotExist()
+        public function testGetBadValues()
         {
-            $this->wisdom->setFilePrefix('test.');
+            $wisdom = new Wisdom;
 
-            $this->wisdom->get('test.yml');
+            $wisdom->get(null, true);
         }
 
         /**
          * @expectedException InvalidArgumentException
-         * @expectedExceptionMessage The $values argument is not an array or implements ArrayAccess.
+         * @expectedExceptionMessage The file "./test.yml" does not exist (in: ).
          */
-        public function testGetInvalidValues()
+        public function testGetBadFile()
         {
-            $this->wisdom->get(null, null, 'test');
+            $wisdom = new Wisdom;
+
+            $wisdom->get('test.yml');
         }
 
         /**
-         * @expectedException RuntimeException
-         * @expectedExceptionMessage No available loader for file:
+         * @expectedException InvalidArgumentException
+         * @expectedExceptionMessage The file "./test.test.yml" does not exist (in: ).
          */
-        public function testGetNoLoader()
+        public function testGetBadFileNested()
         {
-            unlink($file = tempnam(sys_get_temp_dir(), 'wis'));
+            $wisdom = new Wisdom;
 
-            touch($file .= '.json');
+            $wisdom->setPrefix('test.');
 
-            $this->wisdom->get($file);
+            $wisdom->get('test.yml');
+        }
+
+        /**
+         * @expectedException InvalidArgumentException
+         * @expectedExceptionMessage No loader available for file: test.yml
+         */
+        public function testGetMissingLoader()
+        {
+            unlink($dir = tempnam(sys_get_temp_dir(), 'wis'));
+
+            mkdir($dir);
+
+            file_put_contents($dir . '/test.yml', <<<YAML
+rand: %rand%
+YAML
+            );
+
+            $wisdom = new Wisdom($dir);
+
+            $wisdom->get('test.yml');
+        }
+
+        private function getProperty($object, $name)
+        {
+            $class = new ReflectionClass($object);
+
+            while (false === $class->hasProperty($name))
+            {
+                if (null === ($class = $class->getParentClass()))
+                {
+                    return;
+                }
+            }
+
+            $property = $class->getProperty($name);
+
+            $property->setAccessible(true);
+
+            return $property->getValue($object);
         }
     }

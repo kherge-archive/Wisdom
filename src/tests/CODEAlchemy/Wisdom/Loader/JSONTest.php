@@ -11,80 +11,75 @@
 
     namespace CODEAlchemy\Wisdom\Loader;
 
-    use PHPUnit_Framework_TestCase,
-        Symfony\Component\Config\FileLocator;
+    use PHPUnit_Framework_TestCase;
+
+    define('JSON_TEST_CONSTANT', 20);
 
     class JSONTest extends PHPUnit_Framework_TestCase
     {
-        private $loader;
-
-        protected function setUp()
-        {
-            $this->loader = new JSON;
-
-            $this->loader->setFileLocator(new FileLocator(sys_get_temp_dir()));
-        }
-
         public function testGetMessage()
         {
-            $this->assertEquals('Control character error, possibly incorrectly encoded', $this->loader->getMessage(JSON_ERROR_CTRL_CHAR));
-            $this->assertEquals('The maximum stack depth has been exceeded', $this->loader->getMessage(JSON_ERROR_DEPTH));
-            $this->assertEquals('Invalid or malformed JSON', $this->loader->getMessage(JSON_ERROR_STATE_MISMATCH));
-            $this->assertEquals('Syntax error', $this->loader->getMessage(JSON_ERROR_SYNTAX));
-            $this->assertEquals('Malformed UTF-8 characters, possibly incorrectly encoded', $this->loader->getMessage(JSON_ERROR_UTF8));
-            $this->assertEquals('Unknown error code: 123', $this->loader->getMessage(123));
+            $loader = new JSON;
+
+            $this->assertEquals('Control character error, possibly incorrectly encoded', $loader->getMessage(JSON_ERROR_CTRL_CHAR));
+            $this->assertEquals('The maximum stack depth has been exceeded', $loader->getMessage(JSON_ERROR_DEPTH));
+            $this->assertEquals('Invalid or malformed JSON', $loader->getMessage(JSON_ERROR_STATE_MISMATCH));
+            $this->assertEquals('Syntax error', $loader->getMessage(JSON_ERROR_SYNTAX));
+            $this->assertEquals('Malformed UTF-8 characters, possibly incorrectly encoded', $loader->getMessage(JSON_ERROR_UTF8));
+            $this->assertEquals('Unknown error code: 123', $loader->getMessage(123));
         }
 
         public function testLoad()
         {
-            $data = array(
-                'category' => array(
-                    'test' => 'My value.',
-                    'another' => array(
-                        'One',
-                        'Two',
-                        'Three'
+            file_put_contents($tmp = tempnam(sys_get_temp_dir(), 'wis'), <<<INPUT
+{"category":{"constant": #INI_TEST_CONSTANT#, "variable": %rand%, "unchanged": "unchanged"}}
+INPUT
+            );
+
+            $loader = new JSON;
+
+            $loader->setValues(array('rand' => $rand = rand()));
+
+            $this->assertSame(
+                array(
+                    'category' => array(
+                        'constant' => INI_TEST_CONSTANT,
+                        'variable' => $rand,
+                        'unchanged' => 'unchanged'
                     )
                 ),
-                'rand' => rand()
+                $loader->load($tmp)
             );
-
-            file_put_contents(
-                $file = tempnam(sys_get_temp_dir(), 'js'),
-                utf8_encode(json_encode($data))
-            );
-
-            $this->assertSame($data, $this->loader->load($file));
-
-            unlink($file);
         }
 
         /**
          * @expectedException RuntimeException
          * @expectedExceptionMessage Unable to read file:
          */
-        public function testLoadFail()
+        public function testLoadReadFail()
         {
-            @ $this->loader->load('/fake/path');
+            $loader = new JSON;
+
+            @ $loader->load('/path/to/nowhere');
         }
 
         /**
          * @expectedException RuntimeException
-         * @expectedExceptionMessage Syntax error
+         * @expectedExceptionMessage Unable to parse file:
          */
-        public function testLoadJSONFail()
+        public function testLoadParseFail()
         {
-            file_put_contents(
-                $file = tempnam(sys_get_temp_dir(), 'js'),
-                '!'
-            );
+            file_put_contents($tmp = tempnam(sys_get_temp_dir(), 'wis'), '{');
 
-            $this->loader->load($file);
+            $loader = new JSON;
+
+            @ $loader->load($tmp);
         }
 
         public function testSupports()
         {
-            $this->assertFalse(($this->loader->supports('test.php')));
-            $this->assertTrue($this->loader->supports('test.json'));
+            $loader = new JSON;
+
+            $this->assertTrue($loader->supports('test/file.json'));
         }
     }

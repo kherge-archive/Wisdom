@@ -11,12 +11,11 @@
 
     namespace CODEAlchemy\Wisdom\Loader;
 
-    use InvalidArgumentException,
-        Symfony\Component\Config\FileLocatorInterface,
+    use Symfony\Component\Config\FileLocator,
         Symfony\Component\Config\Loader\FileLoader;
 
     /**
-     * Manages Wisdom-specific loader functionality.
+     * Covers basic required functionality for Wisdom loaders.
      *
      * @author Kevin Herrera <kherrera@codealchemy.com>
      */
@@ -25,24 +24,24 @@
         /**
          * The replacement values.
          *
-         * @type array|ArrayAccess
+         * @type array
          */
-        private $values;
+        private $values = array();
 
         /**
-         * Removes constructor requirements set by {@link FileLoader}.
+         * Removes the FileLoader's constructor arguments.
          */
         public function __construct()
         {
         }
 
         /**
-         * Performs the placeholder replacements.
+         * Performs the replacement on the raw data.
          *
-         * @param string $data The raw data to modify.
-         * @return string The modified raw data.
+         * @param string $data The raw data.
+         * @return string The replaced data.
          */
-        public function doReplacements($data)
+        public function doReplace($data)
         {
             $data = preg_replace_callback(
                 '/#([^\s\r#]+)#/',
@@ -81,19 +80,11 @@
         }
 
         /**
-         * Removes the replacement values.
-         */
-        public function removeReplacementValues()
-        {
-            $this->values = null;
-        }
-
-        /**
-         * Sets the FileLocator instance.
+         * Sets or replaces the FileLocator instance.
          *
-         * @param FileLocatorInterface $locator The FileLocator instance.
+         * @param FileLocator $locator The FileLocator instance.
          */
-        public function setFileLocator(FileLocatorInterface $locator)
+        public function setLocator(FileLocator $locator)
         {
             $this->locator = $locator;
         }
@@ -101,20 +92,10 @@
         /**
          * Sets the replacement values.
          *
-         * @param array|ArrayAccess $values The replacement values.
+         * @param array|ArrayAccess The replacement values.
          */
-        public function setReplacementValues($values)
+        public function setValues($values)
         {
-            if (null !== $values)
-            {
-                if (! (is_array($values) || ($values instanceof ArrayAccess)))
-                {
-                    throw new InvalidArgumentException(
-                        'The $values argument is not an array or implements ArrayAccess.'
-                    );
-                }
-            }
-
             $this->values = $values;
         }
     }

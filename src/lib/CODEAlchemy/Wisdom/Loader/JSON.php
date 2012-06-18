@@ -14,7 +14,7 @@
     use RuntimeException;
 
     /**
-     * Wisdom support for JSON files.
+     * Offers support for loading JSON files.
      *
      * @author Kevin Herrera <kherrera@codealchemy.com>
      */
@@ -48,11 +48,11 @@
                 throw new RuntimeException("Unable to read file: $resource");
             }
 
-            $data = json_decode($this->doReplacements($data), true);
+            $data = json_decode($this->doReplace($data), true);
 
             if (JSON_ERROR_NONE !== ($code = json_last_error()))
             {
-                throw new RuntimeException($this->getMessage($code));
+                throw new RuntimeException(sprintf('Unable to parse file: %s', $this->getMessage($code)));
             }
 
             return $data;

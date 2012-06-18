@@ -11,55 +11,47 @@
 
     namespace CODEAlchemy\Wisdom\Loader;
 
-    use PHPUnit_Framework_TestCase,
-        Symfony\Component\Config\FileLocator;
+    use PHPUnit_Framework_TestCase;
+
+    define('INI_TEST_CONSTANT', 20);
 
     class INITest extends PHPUnit_Framework_TestCase
     {
-        private $loader;
-
-        protected function setUp()
-        {
-            $this->loader = new INI;
-
-            $this->loader->setFileLocator(new FileLocator(sys_get_temp_dir()));
-        }
-
         public function testLoad()
         {
-            file_put_contents($file = tempnam(sys_get_temp_dir(), 'ini'), <<<INI
+            file_put_contents($tmp = tempnam(sys_get_temp_dir(), 'wis'), <<<INPUT
 [category]
-test = "My value."
-another[] = "One"
-another[] = "Two"
-another[] = "Three"
-INI
+constant = #INI_TEST_CONSTANT#
+variable = %rand%
+unchanged = "unchanged"
+INPUT
             );
+
+            $loader = new INI;
+
+            $loader->setValues(array('rand' => $rand = rand()));
 
             $this->assertSame(
                 array(
                     'category' => array(
-                        'test' => 'My value.',
-                        'another' => array(
-                            'One',
-                            'Two',
-                            'Three'
-                        )
+                        'constant' => (string) INI_TEST_CONSTANT,
+                        'variable' => "$rand",
+                        'unchanged' => 'unchanged'
                     )
                 ),
-                $this->loader->load($file)
+                $loader->load($tmp)
             );
-
-            unlink($file);
         }
 
         /**
          * @expectedException RuntimeException
          * @expectedExceptionMessage Unable to read file:
          */
-        public function testLoadFail()
+        public function testLoadReadFail()
         {
-            @ $this->loader->load('/fake/path');
+            $loader = new INI;
+
+            @ $loader->load('/path/to/nowhere');
         }
 
         /**
@@ -68,16 +60,20 @@ INI
          */
         public function testLoadParseFail()
         {
-            $file = tempnam(sys_get_temp_dir(), 'ini');
+            file_put_contents($tmp = tempnam(sys_get_temp_dir(), 'wis'), <<<INPUT
+[category
+INPUT
+            );
 
-            file_put_contents($file, 'test[test][test] = fail');
+            $loader = new INI;
 
-            @ $this->loader->load($file);
+            @ $loader->load($tmp);
         }
 
         public function testSupports()
         {
-            $this->assertFalse(($this->loader->supports('test.php')));
-            $this->assertTrue($this->loader->supports('test.ini'));
+            $loader = new INI;
+
+            $this->assertTrue($loader->supports('test/file.ini'));
         }
     }

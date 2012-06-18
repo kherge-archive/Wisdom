@@ -26,12 +26,10 @@
         {
             if (false === ($data = file_get_contents($resource)))
             {
-                throw new RuntimeException(
-                    "Unable to read file: $resource"
-                );
+                throw new RuntimeException(sprintf('Unable to read file: %s', $resource));
             }
 
-            return _Yaml::parse($this->doReplacements($data));
+            return _Yaml::parse($this->doReplace($data));
         }
 
         /** {@inheritDoc} */

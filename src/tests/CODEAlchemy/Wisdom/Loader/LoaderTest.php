@@ -11,86 +11,11 @@
 
     namespace CODEAlchemy\Wisdom\Loader;
 
-    use CODEAlchemy\Wisdom\Config\FileLocator,
-        PHPUnit_Framework_TestCase;
+    use PHPUnit_Framework_TestCase,
+        ReflectionClass,
+        Symfony\Component\Config\FileLocator;
 
-    class LoaderTest extends PHPUnit_Framework_TestCase
-    {
-        private $abstract;
-
-        protected function setUp()
-        {
-            $this->abstract = new _Loader(new FileLocator);
-        }
-
-        public function testAncestry()
-        {
-            $this->assertInstanceOf(
-                'Symfony\Component\Config\Loader\FileLoader',
-                $this->abstract
-            );
-        }
-
-        public function testReplacement()
-        {
-            $this->abstract->setReplacementValues(array(
-                'alpha' => 'beta',
-                'delta' => 'gamma'
-            ));
-
-            $data = <<<TEST
-brokenTest:
-    brokenPart1: %alpha
-    brokenPart2: another%
-    brokenPart3: #beta
-    brokenPart4: antler#
-
-workingTests:
-    variable1: %alpha%
-    variable2: %delta%
-    variable3: %gamma%
-    constant1: #PDO::ERRMODE_EXCEPTION#
-    constant2: #LOCK_EX#
-    constant3: #CONSTANT_SHOULD_NOT_BE_DEFINED#
-TEST
-            ;
-
-            $a = 'beta';
-            $b = 'gamma';
-            $c = \PDO::ERRMODE_EXCEPTION;
-            $d = LOCK_EX;
-            $expected = <<<TEST
-brokenTest:
-    brokenPart1: %alpha
-    brokenPart2: another%
-    brokenPart3: #beta
-    brokenPart4: antler#
-
-workingTests:
-    variable1: $a
-    variable2: $b
-    variable3: %gamma%
-    constant1: $c
-    constant2: $d
-    constant3: #CONSTANT_SHOULD_NOT_BE_DEFINED#
-TEST
-            ;
-
-            $this->assertEquals(
-                $expected,
-                $this->abstract->doReplacements($data)
-            );
-        }
-
-        /**
-         * @expectedException InvalidArgumentException
-         * @expectedExceptionMessage The $values argument is not an array or implements ArrayAccess.
-         */
-        public function testSetInvalid()
-        {
-            $this->abstract->setReplacementValues('test');
-        }
-    }
+    define('TEST_CONSTANT_REPLACE', 15);
 
     class _Loader extends Loader
     {
@@ -100,5 +25,92 @@ TEST
 
         public function supports($resource, $type = null)
         {
+        }
+    }
+
+    class LoaderTest extends PHPUnit_Framework_TestCase
+    {
+        public function testSetLocator()
+        {
+            $loader = new _Loader;
+
+            $locator = new FileLocator;
+
+            $loader->setLocator($locator);
+
+            $class = new ReflectionClass($loader);
+
+            $class = $class->getParentClass();
+
+            $property = $class->getProperty('locator');
+
+            $property->setAccessible(true);
+
+            $this->assertSame($locator, $property->getValue($loader));
+        }
+
+        public function testSetValues()
+        {
+            $loader = new _Loader;
+
+            $values = array('rand' => rand());
+
+            $loader->setValues($values);
+
+            $class = new ReflectionClass($loader);
+
+            $class = $class->getParentClass();
+
+            $property = $class->getProperty('values');
+
+            $property->setAccessible(true);
+
+            $this->assertSame($values, $property->getValue($loader));
+        }
+
+        /**
+         * @depends testSetValues
+         */
+        public function testDoReplace()
+        {
+            $loader = new _Loader;
+
+            $loader->setValues(array('rand' => $rand = rand()));
+
+            $input = <<<RAW
+raw_data:
+    broken:
+        leftConstant: #left
+        leftVariable: %left
+        rightConstant: right#
+        rightVariable: right%
+    working:
+        constantFirst: #TEST_CONSTANT_REPLACE#
+        constantNotSet: #NOT_SET#
+        constantSecond: #TEST_CONSTANT_REPLACE#
+        variableFirst: %rand%
+        variableNotSet: %notSet%
+        variableSecond: %rand%
+RAW
+            ;
+
+            $expected = <<<RAW
+raw_data:
+    broken:
+        leftConstant: #left
+        leftVariable: %left
+        rightConstant: right#
+        rightVariable: right%
+    working:
+        constantFirst: 15
+        constantNotSet: #NOT_SET#
+        constantSecond: 15
+        variableFirst: $rand
+        variableNotSet: %notSet%
+        variableSecond: $rand
+RAW
+            ;
+
+            $this->assertEquals($expected, $loader->doReplace($input));
         }
     }

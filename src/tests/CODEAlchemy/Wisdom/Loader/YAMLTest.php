@@ -11,43 +11,36 @@
 
     namespace CODEAlchemy\Wisdom\Loader;
 
-    use PHPUnit_Framework_TestCase,
-        Symfony\Component\Config\FileLocator,
-        Symfony\Component\Yaml\Yaml as _Yaml;
+    use PHPUnit_Framework_TestCase;
+
+    define('YAML_TEST_CONSTANT', 20);
 
     class YAMLTest extends PHPUnit_Framework_TestCase
     {
-        private $loader;
-
-        protected function setUp()
-        {
-            $this->loader = new YAML;
-
-            $this->loader->setFileLocator(new FileLocator(sys_get_temp_dir()));
-        }
-
         public function testLoad()
         {
-            $data = array(
-                'category' => array(
-                    'test' => 'My value.',
-                    'another' => array(
-                        'One',
-                        'Two',
-                        'Three'
+            file_put_contents($tmp = tempnam(sys_get_temp_dir(), 'wis'), <<<INPUT
+category:
+    constant: #YAML_TEST_CONSTANT#
+    variable: %rand%
+    unchanged: unchanged
+INPUT
+            );
+
+            $loader = new YAML;
+
+            $loader->setValues(array('rand' => $rand = rand()));
+
+            $this->assertSame(
+                array(
+                    'category' => array(
+                        'constant' => INI_TEST_CONSTANT,
+                        'variable' => $rand,
+                        'unchanged' => 'unchanged'
                     )
                 ),
-                'rand' => rand()
+                $loader->load($tmp)
             );
-
-            file_put_contents(
-                $file = tempnam(sys_get_temp_dir(), 'yaml'),
-                _Yaml::dump($data)
-            );
-
-            $this->assertSame($data, $this->loader->load($file));
-
-            unlink($file);
         }
 
         /**
@@ -56,25 +49,27 @@
          */
         public function testLoadReadFail()
         {
-            @ $this->loader->load('/fake/file');
+            $loader = new YAML;
+
+            @ $loader->load('/path/to/nowhere');
         }
 
         /**
          * @expectedException Symfony\Component\Yaml\Exception\ParseException
          */
-        public function testLoadFail()
+        public function testLoadParseFail()
         {
-            file_put_contents(
-                $file = tempnam(sys_get_temp_dir(), 'yaml'),
-                "\t"
-            );
+            file_put_contents($tmp = tempnam(sys_get_temp_dir(), 'wis'), "\t");
 
-            $this->loader->load($file);
+            $loader = new YAML;
+
+            @ $loader->load($tmp);
         }
 
         public function testSupports()
         {
-            $this->assertFalse(($this->loader->supports('test.php')));
-            $this->assertTrue($this->loader->supports('test.yml'));
+            $loader = new YAML;
+
+            $this->assertTrue($loader->supports('test/file.yml'));
         }
     }

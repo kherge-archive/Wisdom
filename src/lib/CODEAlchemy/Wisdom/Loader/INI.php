@@ -14,29 +14,25 @@
     use RuntimeException;
 
     /**
-     * Wisdom support for INI files.
+     * Offers support for loading INI files.
      *
      * @author Kevin Herrera <kherrera@codealchemy.com>
      */
     class INI extends Loader
     {
         /** {@inheritDoc} */
-        public function load($resource, $type = null)
+        public function load ($resource, $type = null)
         {
             if (false === ($data = file_get_contents($resource)))
             {
-                throw new RuntimeException(
-                    "Unable to read file: $resource"
-                );
+                throw new RuntimeException(sprintf('Unable to read file: %s', $resource));
             }
 
-            $data = $this->doReplacements($data);
+            $data = $this->doReplace($data);
 
             if (false === ($data = parse_ini_string($data, true)))
             {
-                throw new RuntimeException(
-                    "Unable to parse file: $resource"
-                );
+                throw new RuntimeException(sprintf('Unable to parse file: %s', $resource));
             }
 
             return $data;
