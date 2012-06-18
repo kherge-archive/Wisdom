@@ -13,11 +13,10 @@
 
     use ArrayAccess,
         CODEAlchemy\Wisdom\Config\FileLocator,
-        CODEAlchemy\Wisdom\Loader\ReplaceInterface,
+        CODEAlchemy\Wisdom\Loader\Loader,
         InvalidArgumentException,
         RuntimeException,
         Symfony\Component\Config\ConfigCache,
-        Symfony\Component\Config\Loader\LoaderInterface,
         Symfony\Component\Config\Loader\LoaderResolver,
         Symfony\Component\Config\Resource\FileResource;
 
@@ -96,16 +95,11 @@
         /**
          * Adds the loader to the loader resolver.
          *
-         * @param LoaderInterface $loader The loader.
+         * @param Loader $loader The loader.
          */
-        public function addLoader(LoaderInterface $loader)
+        public function addLoader(Loader $loader)
         {
-            if (false === ($loader instanceof ReplaceInterface))
-            {
-                throw new InvalidArgumentException(
-                    "The loader does not implement ReplaceInterface."
-                );
-            }
+            $loader->setFileLocator($this->locator);
 
             $this->resolver->addLoader($loader);
         }

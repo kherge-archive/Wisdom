@@ -20,7 +20,9 @@
 
         protected function setUp()
         {
-            $this->loader = new JSON (new FileLocator(sys_get_temp_dir()));
+            $this->loader = new JSON;
+
+            $this->loader->setFileLocator(new FileLocator(sys_get_temp_dir()));
         }
 
         public function testGetMessage()

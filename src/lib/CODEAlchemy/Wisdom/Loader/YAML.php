@@ -19,7 +19,7 @@
      *
      * @author Kevin Herrera <kherrera@codealchemy.com>
      */
-    class YAML extends ReplaceAbstract
+    class YAML extends Loader
     {
         /** {@inheritDoc} */
         public function load($resource, $type = null)

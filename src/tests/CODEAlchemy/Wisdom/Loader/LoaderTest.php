@@ -14,24 +14,19 @@
     use CODEAlchemy\Wisdom\Config\FileLocator,
         PHPUnit_Framework_TestCase;
 
-    class ReplaceAbstractTest extends PHPUnit_Framework_TestCase
+    class LoaderTest extends PHPUnit_Framework_TestCase
     {
         private $abstract;
 
         protected function setUp()
         {
-            $this->abstract = new _ReplaceAbstract(new FileLocator);
+            $this->abstract = new _Loader(new FileLocator);
         }
 
         public function testAncestry()
         {
             $this->assertInstanceOf(
                 'Symfony\Component\Config\Loader\FileLoader',
-                $this->abstract
-            );
-
-            $this->assertInstanceOf(
-                'CODEAlchemy\Wisdom\Loader\ReplaceInterface',
                 $this->abstract
             );
         }
@@ -97,7 +92,7 @@ TEST
         }
     }
 
-    class _ReplaceAbstract extends ReplaceAbstract
+    class _Loader extends Loader
     {
         public function load($resource, $type = null)
         {

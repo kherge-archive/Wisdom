@@ -20,7 +20,9 @@
 
         protected function setUp()
         {
-            $this->loader = new INI (new FileLocator(sys_get_temp_dir()));
+            $this->loader = new INI;
+
+            $this->loader->setFileLocator(new FileLocator(sys_get_temp_dir()));
         }
 
         public function testLoad()

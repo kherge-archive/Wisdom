@@ -104,6 +104,8 @@ INI
                 )
             ));
 
+            $this->app['wisdom']->setReplacementValues(null);
+
             $settings = $this->app['wisdom']->get('test.ini');
 
             $this->assertEquals('value', $settings['my']);

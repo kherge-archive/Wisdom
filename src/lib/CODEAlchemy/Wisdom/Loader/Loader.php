@@ -11,16 +11,16 @@
 
     namespace CODEAlchemy\Wisdom\Loader;
 
-    use ArrayAccess,
-        InvalidArgumentException,
+    use InvalidArgumentException,
+        Symfony\Component\Config\FileLocatorInterface,
         Symfony\Component\Config\Loader\FileLoader;
 
     /**
-     * An extension of {@link FileLoader} with support for replacements.
+     * Manages Wisdom-specific loader functionality.
      *
      * @author Kevin Herrera <kherrera@codealchemy.com>
      */
-    abstract class ReplaceAbstract extends FileLoader implements ReplaceInterface
+    abstract class Loader extends FileLoader
     {
         /**
          * The replacement values.
@@ -29,7 +29,19 @@
          */
         private $values;
 
-        /** {@inheritDoc} */
+        /**
+         * Removes constructor requirements set by {@link FileLoader}.
+         */
+        public function __construct()
+        {
+        }
+
+        /**
+         * Performs the placeholder replacements.
+         *
+         * @param string $data The raw data to modify.
+         * @return string The modified raw data.
+         */
         public function doReplacements($data)
         {
             $data = preg_replace_callback(
@@ -68,13 +80,29 @@
             return $data;
         }
 
-        /** {@inheritDoc} */
+        /**
+         * Removes the replacement values.
+         */
         public function removeReplacementValues()
         {
             $this->values = null;
         }
 
-        /** {@inheritDoc} */
+        /**
+         * Sets the FileLocator instance.
+         *
+         * @param FileLocatorInterface $locator The FileLocator instance.
+         */
+        public function setFileLocator(FileLocatorInterface $locator)
+        {
+            $this->locator = $locator;
+        }
+
+        /**
+         * Sets the replacement values.
+         *
+         * @param array|ArrayAccess $values The replacement values.
+         */
         public function setReplacementValues($values)
         {
             if (null !== $values)

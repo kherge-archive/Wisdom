@@ -102,15 +102,6 @@
         }
 
         /**
-         * @expectedException InvalidArgumentException
-         * @expectedExceptionMessage The loader does not implement ReplaceInterface.
-         */
-        public function testAddLoaderFail()
-        {
-            $this->wisdom->addLoader(new DelegatingLoader (new LoaderResolver));
-        }
-
-        /**
          * @depends testGetPaths
          */
         public function testAddPath()

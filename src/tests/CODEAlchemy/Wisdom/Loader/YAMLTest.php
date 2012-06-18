@@ -21,7 +21,9 @@
 
         protected function setUp()
         {
-            $this->loader = new YAML (new FileLocator(sys_get_temp_dir()));
+            $this->loader = new YAML;
+
+            $this->loader->setFileLocator(new FileLocator(sys_get_temp_dir()));
         }
 
         public function testLoad()

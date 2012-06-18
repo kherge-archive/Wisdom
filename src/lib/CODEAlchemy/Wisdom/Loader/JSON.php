@@ -18,7 +18,7 @@
      *
      * @author Kevin Herrera <kherrera@codealchemy.com>
      */
-    class JSON extends ReplaceAbstract
+    class JSON extends Loader
     {
         /**
          * Returns the error message for the JSON error code.

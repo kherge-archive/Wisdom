@@ -18,7 +18,7 @@
      *
      * @author Kevin Herrera <kherrera@codealchemy.com>
      */
-    class INI extends ReplaceAbstract
+    class INI extends Loader
     {
         /** {@inheritDoc} */
         public function load($resource, $type = null)
