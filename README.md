@@ -1,6 +1,7 @@
 # Wisdom
 
-Symfony Config for the rest of us.
+Wisdom uses the Symfony Config component to load configuration settings from files.
+
 
 [![Build Status](https://secure.travis-ci.org/codealchemy/Wisdom.png?branch=master)](http://travis-ci.org/codealchemy/Wisdom)
 
