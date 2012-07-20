@@ -17,7 +17,7 @@
     },
     
     "require-dev": {
-        "silex/silex": "1.0.*",
+        "silex/silex": "@dev",
         "symfony/yaml": "2.1.*"
     },
     
