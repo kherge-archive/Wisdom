@@ -1,40 +1,40 @@
 <?php
 
-    /* This file is part of Wisdom.
-     *
-     * (c) 2012 Kevin Herrera
-     *
-     * For the full copyright and license information, please
-     * view the LICENSE file that was distributed with this
-     * source code.
-     */
+/* This file is part of Wisdom.
+ *
+ * (c) 2012 Kevin Herrera
+ *
+ * For the full copyright and license information, please
+ * view the LICENSE file that was distributed with this
+ * source code.
+ */
 
-    namespace CODEAlchemy\Wisdom\Loader;
+namespace CODEAlchemy\Wisdom\Loader;
 
-    use RuntimeException,
-        Symfony\Component\Yaml\Yaml as _Yaml;
+use RuntimeException;
+use Symfony\Component\Yaml\Yaml as Base;
 
-    /**
-     * Wisdom support for YAML files.
-     *
-     * @author Kevin Herrera <kherrera@codealchemy.com>
-     */
-    class YAML extends Loader
+/**
+ * Wisdom support for YAML files.
+ *
+ * @author Kevin Herrera <kherrera@codealchemy.com>
+ */
+class YAML extends Loader
+{
+    /** {@inheritDoc} */
+    public function load($resource, $type = null)
     {
-        /** {@inheritDoc} */
-        public function load($resource, $type = null)
-        {
-            if (false === ($data = file_get_contents($resource)))
-            {
-                throw new RuntimeException(sprintf('Unable to read file: %s', $resource));
-            }
-
-            return _Yaml::parse($this->doReplace($data));
+        if (false === ($data = file_get_contents($resource))) {
+            throw new RuntimeException(sprintf('Unable to read file: %s', $resource));
         }
 
-        /** {@inheritDoc} */
-        public function supports($resource, $type = null)
-        {
-            return ('yml' == pathinfo($resource, PATHINFO_EXTENSION));
-        }
+        return Base::parse($this->doReplace($data));
     }
+
+    /** {@inheritDoc} */
+    public function supports($resource, $type = null)
+    {
+        return ('yml' == pathinfo($resource, PATHINFO_EXTENSION));
+    }
+}
+

@@ -1,32 +1,33 @@
 <?php
 
-    /* This file is part of Wisdom.
-     *
-     * (c) 2012 Kevin Herrera
-     *
-     * For the full copyright and license information, please
-     * view the LICENSE file that was distributed with this
-     * source code.
-     */
+/* This file is part of Wisdom.
+ *
+ * (c) 2012 Kevin Herrera
+ *
+ * For the full copyright and license information, please
+ * view the LICENSE file that was distributed with this
+ * source code.
+ */
 
-    namespace CODEAlchemy\Wisdom\Config;
+namespace CODEAlchemy\Wisdom\Config;
 
-    use Symfony\Component\Config\FileLocator as _FileLocator;
+use Symfony\Component\Config\FileLocator as Base;
 
+/**
+ * Allows paths to be added to FileLocator.
+ *
+ * @author Kevin Herrera <kherrera@codealchemy.com>
+ */
+class FileLocator extends Base
+{
     /**
-     * Allows paths to be added to FileLocator.
+     * The directory path to add.
      *
-     * @author Kevin Herrera <kherrera@codealchemy.com>
+     * @param string $path The directory path.
      */
-    class FileLocator extends _FileLocator
+    public function addPath($path)
     {
-        /**
-         * The directory path to add.
-         *
-         * @param string $path The directory path.
-         */
-        public function addPath($path)
-        {
-            $this->paths[] = $path;
-        }
+        $this->paths[] = $path;
     }
+}
+

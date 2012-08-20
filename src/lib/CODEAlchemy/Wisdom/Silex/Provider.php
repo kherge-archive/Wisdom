@@ -1,45 +1,50 @@
 <?php
 
-    /* This file is part of Wisdom.
-     *
-     * (c) 2012 Kevin Herrera
-     *
-     * For the full copyright and license information, please
-     * view the LICENSE file that was distributed with this
-     * source code.
-     */
+/* This file is part of Wisdom.
+ *
+ * (c) 2012 Kevin Herrera
+ *
+ * For the full copyright and license information, please
+ * view the LICENSE file that was distributed with this
+ * source code.
+ */
 
-    namespace CODEAlchemy\Wisdom\Silex;
+namespace CODEAlchemy\Wisdom\Silex;
 
-    use CODEAlchemy\Wisdom\Wisdom,
-        Silex\Application,
-        Silex\ServiceProviderInterface;
+use CODEAlchemy\Wisdom\Wisdom;
+use Silex\Application;
+use Silex\ServiceProviderInterface;
+
+/**
+ * A Silex service provider for Wisdom.
+ *
+ * @author Kevin Herrera <kherrera@codealchemy.com>
+ */
+class Provider implements ServiceProviderInterface
+{
+    /** {@inheritDoc} */
+    public function boot(Application $app)
+    {
+    }
 
     /**
-     * A Silex service provider for Wisdom.
+     * Creates a Wisdom service provider.
      *
-     * @author Kevin Herrera <kherrera@codealchemy.com>
+     * @param string $serviceName ?
+     * @param string $pathName ?
+     * @param string $optionsName ?
      */
-    class Provider implements ServiceProviderInterface
+    public static function createService(Application $app, $serviceName, $pathsName, $optionsName)
     {
-        /** {@inheritDoc} */
-        public function boot(Application $app)
-        {
-        }
+        $app[$optionsName] = array();
 
-        /**
-         * Creates a Wisdom service provider.
-         *
-         * @param string $serviceName ?
-         * @param string $pathName ?
-         * @param string $optionsName ?
-         */
-        public static function createService(Application $app, $serviceName, $pathsName, $optionsName)
-        {
-            $app[$optionsName] = array();
-
-            $app[$serviceName] = $app->share(function () use ($app, $serviceName, $pathsName, $optionsName)
-            {
+        $app[$serviceName] = $app->share(
+            function () use (
+                $app,
+                $serviceName,
+                $pathsName,
+                $optionsName
+                ) {
                 $app[$optionsName] = array_merge(
                     array(
                         'cache_path' => '',
@@ -49,8 +54,7 @@
                     $app[$optionsName]
                 );
 
-                if (false === isset($app[$optionsName]['loaders']))
-                {
+                if (false === isset($app[$optionsName]['loaders'])) {
                     $options = $app[$optionsName];
 
                     $options['loaders'] = array(
@@ -58,8 +62,7 @@
                         'CODEAlchemy\Wisdom\Loader\JSON'
                     );
 
-                    if (class_exists('Symfony\Component\Yaml\Yaml'))
-                    {
+                    if (class_exists('Symfony\Component\Yaml\Yaml')) {
                         $options['loaders'][] = 'CODEAlchemy\Wisdom\Loader\YAML';
                     }
 
@@ -73,18 +76,19 @@
                 $wisdom->setPrefix($app[$optionsName]['prefix']);
                 $wisdom->setValues($app);
 
-                foreach ((array) $app[$optionsName]['loaders'] as $class)
-                {
+                foreach ((array) $app[$optionsName]['loaders'] as $class) {
                     $wisdom->addLoader(new $class);
                 }
 
                 return $wisdom;
-            });
-        }
-
-        /** {@inheritDoc} */
-        public function register(Application $app)
-        {
-            self::createService($app, 'wisdom', 'wisdom.path', 'wisdom.options');
-        }
+            }
+        );
     }
+
+    /** {@inheritDoc} */
+    public function register(Application $app)
+    {
+        self::createService($app, 'wisdom', 'wisdom.path', 'wisdom.options');
+    }
+}
+
