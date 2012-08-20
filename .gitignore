@@ -3,4 +3,4 @@
 !.travis.yml
 composer.lock
 coverage/
-vendor/
+src/vendors/
