@@ -9,7 +9,7 @@
  * source code.
  */
 
-namespace CODEAlchemy\Wisdom\Config;
+namespace KevinGH\Wisdom\Config;
 
 use PHPUnit_Framework_TestCase;
 use ReflectionProperty;

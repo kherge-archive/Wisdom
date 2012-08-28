@@ -9,11 +9,11 @@
  * source code.
  */
 
-namespace CODEAlchemy\Wisdom;
+namespace KevinGH\Wisdom;
 
 use ArrayAccess;
-use CODEAlchemy\Wisdom\Config\FileLocator;
-use CODEAlchemy\Wisdom\Loader\Loader;
+use KevinGH\Wisdom\Config\FileLocator;
+use KevinGH\Wisdom\Loader\Loader;
 use InvalidArgumentException;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Config\Loader\LoaderResolver;
@@ -22,7 +22,7 @@ use Symfony\Component\Config\Resource\FileResource;
 /**
  * Loads configuration data using Symfony Config.
  *
- * @author Kevin Herrera <kherrera@codealchemy.com>
+ * @author Kevin Herrera <me@kevingh.com>
  */
 class Wisdom
 {
@@ -104,8 +104,9 @@ class Wisdom
     /**
      * Returns the data for the configuration file.
      *
-     * @param string $file The file name.
+     * @param string            $file   The file name.
      * @param array|ArrayAccess $values The new replacement values.
+     *
      * @return array The configuration data.
      */
     public function get($file, $values = null)

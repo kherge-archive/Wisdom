@@ -9,11 +9,11 @@
  * source code.
  */
 
-namespace CODEAlchemy\Wisdom;
+namespace KevinGH\Wisdom;
 
 use ArrayObject;
-use CODEAlchemy\Wisdom\Loader\INI;
-use CODEAlchemy\Wisdom\Loader\YAML;
+use KevinGH\Wisdom\Loader\INI;
+use KevinGH\Wisdom\Loader\YAML;
 use PHPUnit_Framework_TestCase;
 use ReflectionClass;
 
@@ -45,8 +45,17 @@ class WisdomTest extends PHPUnit_Framework_TestCase
 
         $wisdom->addLoader($loader);
 
-        $this->assertSame($this->getProperty($wisdom, 'locator'), $this->getProperty($wisdom, 'locator'));
-        $this->assertSame(array($loader), $this->getProperty($this->getProperty($wisdom, 'resolver'), 'loaders'));
+        $this->assertSame(
+            $this->getProperty($wisdom, 'locator'),
+            $this->getProperty($wisdom, 'locator')
+        );
+        $this->assertSame(
+            array($loader),
+            $this->getProperty(
+                $this->getProperty($wisdom, 'resolver'),
+                'loaders'
+            )
+        );
     }
 
     public function testSetCache()

@@ -9,14 +9,14 @@
  * source code.
  */
 
-namespace CODEAlchemy\Wisdom\Loader;
+namespace KevinGH\Wisdom\Loader;
 
 use RuntimeException;
 
 /**
  * Offers support for loading JSON files.
  *
- * @author Kevin Herrera <kherrera@codealchemy.com>
+ * @author Kevin Herrera <me@kevingh.com>
  */
 class JSON extends Loader
 {
@@ -50,7 +50,10 @@ class JSON extends Loader
     public function load($resource, $type = null)
     {
         if (false === ($data = file_get_contents($resource))) {
-            throw new RuntimeException("Unable to read file: $resource");
+            throw new RuntimeException(sprintf(
+                'Unable to read file: %s',
+                $resource
+            ));
         }
 
         $data = json_decode($this->doReplace($data), true);

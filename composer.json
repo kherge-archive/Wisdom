@@ -1,13 +1,13 @@
 {
     "type": "library",
-    "name": "codealchemy/wisdom",
+    "name": "kherge/wisdom",
     "description": "A Symfony Config-based configuration loader.",
-    "homepage": "http://github.com/codealchemy/Wisdom",
+    "homepage": "http://github.com/kherge/Wisdom",
     "license": "MIT",
     "authors": [
         {
             "name": "Kevin Herrera",
-            "email": "kherrera@codealchemy.com"
+            "email": "me@kevingh.com"
         }
     ],
 
@@ -28,7 +28,7 @@
 
     "autoload": {
         "psr-0": {
-            "CODEAlchemy\\Wisdom": "src/lib/"
+            "KevinGH\\Wisdom": "src/lib/"
         }
     },
 

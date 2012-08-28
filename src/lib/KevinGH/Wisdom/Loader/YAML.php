@@ -9,7 +9,7 @@
  * source code.
  */
 
-namespace CODEAlchemy\Wisdom\Loader;
+namespace KevinGH\Wisdom\Loader;
 
 use RuntimeException;
 use Symfony\Component\Yaml\Yaml as Base;
@@ -17,7 +17,7 @@ use Symfony\Component\Yaml\Yaml as Base;
 /**
  * Wisdom support for YAML files.
  *
- * @author Kevin Herrera <kherrera@codealchemy.com>
+ * @author Kevin Herrera <me@kevingh.com>
  */
 class YAML extends Loader
 {
@@ -25,7 +25,10 @@ class YAML extends Loader
     public function load($resource, $type = null)
     {
         if (false === ($data = file_get_contents($resource))) {
-            throw new RuntimeException(sprintf('Unable to read file: %s', $resource));
+            throw new RuntimeException(sprintf(
+                'Unable to read file: %s',
+                $resource
+            ));
         }
 
         return Base::parse($this->doReplace($data));

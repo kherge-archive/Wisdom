@@ -9,15 +9,15 @@
  * source code.
  */
 
-namespace CODEAlchemy\Wisdom\Loader;
+namespace KevinGH\Wisdom\Loader;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\FileLoader;
 
 /**
- * Covers basic required functionality for Wisdom loaders.
+ * Covers basic functionality required for Wisdom loaders.
  *
- * @author Kevin Herrera <kherrera@codealchemy.com>
+ * @author Kevin Herrera <me@kevingh.com>
  */
 abstract class Loader extends FileLoader
 {
@@ -39,6 +39,7 @@ abstract class Loader extends FileLoader
      * Performs the replacement on the raw data.
      *
      * @param string $data The raw data.
+     *
      * @return string The replaced data.
      */
     public function doReplace($data)

@@ -9,7 +9,7 @@
  * source code.
  */
 
-namespace CODEAlchemy\Wisdom\Loader;
+namespace KevinGH\Wisdom\Loader;
 
 use PHPUnit_Framework_TestCase;
 

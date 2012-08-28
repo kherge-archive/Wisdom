@@ -9,21 +9,21 @@
  * source code.
  */
 
-namespace CODEAlchemy\Wisdom\Config;
+namespace KevinGH\Wisdom\Config;
 
 use Symfony\Component\Config\FileLocator as Base;
 
 /**
  * Allows paths to be added to FileLocator.
  *
- * @author Kevin Herrera <kherrera@codealchemy.com>
+ * @author Kevin Herrera <me@kevingh.com>
  */
 class FileLocator extends Base
 {
     /**
-     * The directory path to add.
+     * Adds a new directory path to the list of current paths.
      *
-     * @param string $path The directory path.
+     * @param string $path A directory path.
      */
     public function addPath($path)
     {

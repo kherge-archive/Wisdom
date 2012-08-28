@@ -9,16 +9,16 @@
  * source code.
  */
 
-namespace CODEAlchemy\Wisdom\Silex;
+namespace KevinGH\Wisdom\Silex;
 
-use CODEAlchemy\Wisdom\Wisdom;
+use KevinGH\Wisdom\Wisdom;
 use Silex\Application;
 use Silex\ServiceProviderInterface;
 
 /**
  * A Silex service provider for Wisdom.
  *
- * @author Kevin Herrera <kherrera@codealchemy.com>
+ * @author Kevin Herrera <me@kevingh.com>
  */
 class Provider implements ServiceProviderInterface
 {
@@ -30,14 +30,13 @@ class Provider implements ServiceProviderInterface
     /**
      * Creates a Wisdom service provider.
      *
-     * @param string $serviceName ?
-     * @param string $pathName ?
-     * @param string $optionsName ?
+     * @param string $serviceName The new service name.
+     * @param string $pathName    The new path parameter name.
+     * @param string $optionsName The new options parameter name.
      */
     public static function createService(Application $app, $serviceName, $pathsName, $optionsName)
     {
         $app[$optionsName] = array();
-
         $app[$serviceName] = $app->share(
             function () use (
                 $app,
@@ -58,12 +57,12 @@ class Provider implements ServiceProviderInterface
                     $options = $app[$optionsName];
 
                     $options['loaders'] = array(
-                        'CODEAlchemy\Wisdom\Loader\INI',
-                        'CODEAlchemy\Wisdom\Loader\JSON'
+                        'KevinGH\Wisdom\Loader\INI',
+                        'KevinGH\Wisdom\Loader\JSON'
                     );
 
                     if (class_exists('Symfony\Component\Yaml\Yaml')) {
-                        $options['loaders'][] = 'CODEAlchemy\Wisdom\Loader\YAML';
+                        $options['loaders'][] = 'KevinGH\Wisdom\Loader\YAML';
                     }
 
                     $app[$optionsName] = $options;

@@ -9,7 +9,7 @@
  * source code.
  */
 
-namespace CODEAlchemy\Wisdom\Silex;
+namespace KevinGH\Wisdom\Silex;
 
 use PHPUnit_Framework_TestCase;
 use ReflectionClass;
@@ -49,7 +49,7 @@ YAML
 
         $app['test.path'] = $dir;
 
-        $this->assertInstanceOf('CODEAlchemy\Wisdom\Wisdom', $app['test']);
+        $this->assertInstanceOf('KevinGH\Wisdom\Wisdom', $app['test']);
         $this->assertEquals($dir, $this->getProperty($app['test'], 'cache'));
         $this->assertSame($app['debug'], $this->getProperty($app['test'], 'debug'));
         $this->assertEquals('test.', $this->getProperty($app['test'], 'prefix'));
@@ -57,9 +57,9 @@ YAML
 
         $loaders = $this->getProperty($this->getProperty($app['test'], 'resolver'), 'loaders');
 
-        $this->assertInstanceOf('CODEAlchemy\Wisdom\Loader\INI', $loaders[0]);
-        $this->assertInstanceOf('CODEAlchemy\Wisdom\Loader\JSON', $loaders[1]);
-        $this->assertInstanceOf('CODEAlchemy\Wisdom\Loader\YAML', $loaders[2]);
+        $this->assertInstanceOf('KevinGH\Wisdom\Loader\INI', $loaders[0]);
+        $this->assertInstanceOf('KevinGH\Wisdom\Loader\JSON', $loaders[1]);
+        $this->assertInstanceOf('KevinGH\Wisdom\Loader\YAML', $loaders[2]);
     }
 
     public function testRegister()

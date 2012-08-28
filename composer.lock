@@ -1,0 +1,54 @@
+{
+    "hash": "256dfa3bbf9378417ddc928e5c6f1b2b",
+    "packages": [
+        {
+            "package": "symfony/config",
+            "version": "v2.1.0-RC1"
+        }
+    ],
+    "packages-dev": [
+        {
+            "package": "pimple/pimple",
+            "version": "1.0.0"
+        },
+        {
+            "package": "silex/silex",
+            "version": "dev-master",
+            "alias-pretty-version": "1.0.x-dev",
+            "alias-version": "1.0.9999999.9999999-dev"
+        },
+        {
+            "package": "silex/silex",
+            "version": "dev-master",
+            "source-reference": "331454f7235da0aea8bd9c7e5fe5cfd9f043a069",
+            "commit-date": "1345728064"
+        },
+        {
+            "package": "symfony/event-dispatcher",
+            "version": "v2.1.0-RC1"
+        },
+        {
+            "package": "symfony/http-foundation",
+            "version": "v2.1.0-RC1"
+        },
+        {
+            "package": "symfony/http-kernel",
+            "version": "v2.1.0-RC1"
+        },
+        {
+            "package": "symfony/routing",
+            "version": "v2.1.0-RC1"
+        },
+        {
+            "package": "symfony/yaml",
+            "version": "v2.1.0-RC1"
+        }
+    ],
+    "aliases": [
+
+    ],
+    "minimum-stability": "beta",
+    "stability-flags": {
+        "silex/silex": 20
+    }
+}

@@ -9,14 +9,14 @@
  * source code.
  */
 
-namespace CODEAlchemy\Wisdom\Loader;
+namespace KevinGH\Wisdom\Loader;
 
 use RuntimeException;
 
 /**
  * Offers support for loading INI files.
  *
- * @author Kevin Herrera <kherrera@codealchemy.com>
+ * @author Kevin Herrera <me@kevingh.com>
  */
 class INI extends Loader
 {
@@ -24,13 +24,19 @@ class INI extends Loader
     public function load ($resource, $type = null)
     {
         if (false === ($data = file_get_contents($resource))) {
-            throw new RuntimeException(sprintf('Unable to read file: %s', $resource));
+            throw new RuntimeException(sprintf(
+                'Unable to read file: %s',
+                $resource
+            ));
         }
 
         $data = $this->doReplace($data);
 
         if (false === ($data = parse_ini_string($data, true))) {
-            throw new RuntimeException(sprintf('Unable to parse file: %s', $resource));
+            throw new RuntimeException(sprintf(
+                'Unable to parse file: %s',
+                $resource
+            ));
         }
 
         return $data;
