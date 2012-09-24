@@ -30,18 +30,19 @@ class Provider implements ServiceProviderInterface
     /**
      * Creates a Wisdom service provider.
      *
-     * @param string $serviceName The new service name.
-     * @param string $pathName    The new path parameter name.
-     * @param string $optionsName The new options parameter name.
+     * @param Application $app         The Silex application.
+     * @param string      $serviceName The new service name.
+     * @param string      $pathName    The new path parameter name.
+     * @param string      $optionsName The new options parameter name.
      */
-    public static function createService(Application $app, $serviceName, $pathsName, $optionsName)
+    public static function createService(Application $app, $serviceName, $pathName, $optionsName)
     {
         $app[$optionsName] = array();
         $app[$serviceName] = $app->share(
             function () use (
                 $app,
                 $serviceName,
-                $pathsName,
+                $pathName,
                 $optionsName
                 ) {
                 $app[$optionsName] = array_merge(
@@ -68,7 +69,7 @@ class Provider implements ServiceProviderInterface
                     $app[$optionsName] = $options;
                 }
 
-                $wisdom = new Wisdom ($app[$pathsName]);
+                $wisdom = new Wisdom ($app[$pathName]);
 
                 $wisdom->setCache($app[$optionsName]['cache_path']);
                 $wisdom->setDebug($app[$optionsName]['debug']);

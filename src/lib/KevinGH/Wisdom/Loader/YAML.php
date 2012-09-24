@@ -37,7 +37,7 @@ class YAML extends Loader
     /** {@inheritDoc} */
     public function supports($resource, $type = null)
     {
-        return ('yml' == pathinfo($resource, PATHINFO_EXTENSION));
+        return ('yml' === pathinfo($resource, PATHINFO_EXTENSION));
     }
 }
 
