@@ -71,7 +71,7 @@ class JSON extends Loader
     /** {@inheritDoc} */
     public function supports($resource, $type = null)
     {
-        return ('json' == pathinfo($resource, PATHINFO_EXTENSION));
+        return ('json' === pathinfo($resource, PATHINFO_EXTENSION));
     }
 }
 
