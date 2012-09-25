@@ -104,22 +104,26 @@ class Wisdom
     /**
      * Returns the data for the configuration file.
      *
-     * @param string            $file   The file name.
-     * @param array|ArrayAccess $values The new replacement values.
+     * @param string       $file   The file name.
+     * @param array|object $values The new replacement values.
      *
      * @return array The configuration data.
+     *
+     * @throws InvalidArgumentException If the value is not supported.
      */
     public function get($file, $values = null)
     {
-        if ((null !== $values)
-            && (false === is_array($values))
-            && (false === ($values instanceof ArrayAccess))) {
-            throw new InvalidArgumentException(
-                'The value of $values is not an array or an instance of ArrayAccess.'
-            );
+        if ((null !== $values && (false === is_array($values)))) {
+            if (false === ($values instanceof ArrayAccess)) {
+                throw new InvalidArgumentException(
+                    'The value of $values is not an array or an instance of ArrayAccess.'
+                );
+            }
         }
 
-        if (null === $values) {
+        if (null !== $values) {
+            $values = $this->mergeValues($this->values, $values);
+        } else {
             $values = $this->values;
         }
 
@@ -157,7 +161,7 @@ class Wisdom
             ));
         }
 
-        $loader->setValues($this->values);
+        $loader->setValues($values);
 
         $data = $loader->load($found);
 
@@ -204,19 +208,45 @@ class Wisdom
     /**
      * Sets the default replacement values.
      *
-     * @param array|ArrayAccess|null The replacement values.
+     * @param array|object The replacement values.
+     *
+     * @throws InvalidArgumentException If the value is not supported.
      */
     public function setValues($values)
     {
-        if ((null !== $values)
-            && (false === is_array($values))
-            && (false === ($values instanceof ArrayAccess))) {
-            throw new InvalidArgumentException(
-                'The value of $values is not an array or an instance of ArrayAccess.'
-            );
+        if ((null !== $values && (false === is_array($values)))) {
+            if (false === ($values instanceof ArrayAccess)) {
+                throw new InvalidArgumentException(
+                    'The value of $values is not an array or an instance of ArrayAccess.'
+                );
+            }
         }
 
         $this->values = $values;
+    }
+
+    /**
+     * Merges two sets of replacement values.
+     *
+     * @param array|object $a The replacement values.
+     * @param array|object $b The replacement values.
+     *
+     * @return array The merged values.
+     */
+    private function mergeValues($a, $b)
+    {
+        $x = array();
+        $y = array();
+
+        if (is_array($a)) {
+            $x = $a;
+        }
+
+        foreach ($b as $key => $value) {
+            $x[$key] = $value;
+        }
+
+        return $x;
     }
 }
 

@@ -14,6 +14,7 @@ namespace KevinGH\Wisdom;
 use ArrayObject;
 use KevinGH\Wisdom\Loader\INI;
 use KevinGH\Wisdom\Loader\YAML;
+use NonTraversable;
 use PHPUnit_Framework_TestCase;
 use ReflectionClass;
 
@@ -135,6 +136,50 @@ YAML
 
         $this->assertSame(array('rand' => $rand), $wisdom->get('test.yml'));
         $this->assertSame(array('rand' => $rand), $wisdom->get('test.yml'));
+    }
+
+    /**
+     * @depends testGet
+     */
+    public function testGetObject()
+    {
+        unlink($dir = tempnam(sys_get_temp_dir(), 'wis'));
+        mkdir($dir);
+
+        file_put_contents($dir . '/test.yml', <<<YAML
+rand: %rand%
+YAML
+        );
+
+        $wisdom = new Wisdom($dir);
+        $a = new ArrayObject();
+        $b = new ArrayObject();
+
+        $a['rand'] = $x = rand();
+        $b['rand'] = $y = rand();
+
+        $wisdom->addLoader(new YAML);
+        $wisdom->setCache($dir);
+        $wisdom->setPrefix('test.');
+        $wisdom->setValues($a);
+
+        $this->assertSame(array('rand' => $x), $wisdom->get('test.yml'));
+
+        unlink($dir . '/test.yml.php');
+
+        $this->assertSame(array('rand' => $y), $wisdom->get('test.yml', $b));
+        $this->assertEquals($x, $a['rand']);
+        $this->assertEquals($y, $b['rand']);
+
+        unlink($dir . '/test.yml.php');
+
+        $a = array('rand' => $x);
+
+        $wisdom->setValues($a);
+
+        $this->assertSame(array('rand' => $y), $wisdom->get('test.yml', $b));
+        $this->assertEquals($x, $a['rand']);
+        $this->assertEquals($y, $b['rand']);
     }
 
     /**
