@@ -113,7 +113,7 @@ class Wisdom
      */
     public function get($file, $values = null)
     {
-        if ((null !== $values && (false === is_array($values)))) {
+        if ((null !== $values) && (false === is_array($values))) {
             if (false === ($values instanceof ArrayAccess)) {
                 throw new InvalidArgumentException(
                     'The value of $values is not an array or an instance of ArrayAccess.'
@@ -214,7 +214,7 @@ class Wisdom
      */
     public function setValues($values)
     {
-        if ((null !== $values && (false === is_array($values)))) {
+        if ((null !== $values) && (false === is_array($values))) {
             if (false === ($values instanceof ArrayAccess)) {
                 throw new InvalidArgumentException(
                     'The value of $values is not an array or an instance of ArrayAccess.'
