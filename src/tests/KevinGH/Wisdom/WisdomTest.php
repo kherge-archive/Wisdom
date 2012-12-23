@@ -176,7 +176,7 @@ YAML
 
         $result = $wisdom->get('a.yml');
 
-        $this->assertEquals(901, $result['a_value']);
+        $this->assertEquals(array(012), $result['a_value']);
         $this->assertEquals(678, $result['b_value']);
         $this->assertEquals(234, $result['c_value']);
     }
