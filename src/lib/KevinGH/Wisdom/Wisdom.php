@@ -209,9 +209,9 @@ class Wisdom
         unset($data['imports']);
 
         foreach ($imports as $resource) {
-            $data = array_merge(
-                $data,
-                $this->get($resource, $values, $imported)
+            $data = array_replace(
+                $this->get($resource, $values, $imported),
+                $data
             );
         }
 
