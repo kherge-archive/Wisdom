@@ -15,6 +15,7 @@ use ArrayAccess;
 use KevinGH\Wisdom\Config\FileLocator;
 use KevinGH\Wisdom\Loader\Loader;
 use InvalidArgumentException;
+use LogicException;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\Resource\FileResource;
@@ -104,14 +105,16 @@ class Wisdom
     /**
      * Returns the data for the configuration file.
      *
-     * @param string       $file   The file name.
-     * @param array|object $values The new replacement values.
+     * @param string       $file      The file name.
+     * @param array|object $values    The new replacement values.
+     * @param array        &$imported The list of imported resources.
      *
      * @return array The configuration data.
      *
      * @throws InvalidArgumentException If the value is not supported.
+     * @throws LogicException           If a circular dependency is detected.
      */
-    public function get($file, $values = null)
+    public function get($file, $values = null, array &$imported = array())
     {
         if ((null !== $values) && (false === is_array($values))) {
             if (false === ($values instanceof ArrayAccess)) {
@@ -143,6 +146,15 @@ class Wisdom
             }
         }
 
+        if (in_array($found, $imported)) {
+            throw new LogicException(sprintf(
+                'Circular dependency detected for: %s',
+                $found
+            ));
+        }
+
+        $imported[] = $found;
+
         if (false === empty($this->cache)) {
             $cache = new ConfigCache(
                 $this->cache . DIRECTORY_SEPARATOR . $file . '.php',
@@ -150,7 +162,7 @@ class Wisdom
             );
 
             if ($cache->isFresh()) {
-                return require $cache;
+                return $this->import(require $cache, $values, $imported);
             }
         }
 
@@ -169,6 +181,37 @@ class Wisdom
             $cache->write(
                 '<?php return ' . var_export($data, true) . ';',
                 array(new FileResource($found))
+            );
+        }
+
+        return $this->import($data, $values, $imported);
+    }
+
+    /**
+     * Manages the "imports" directive in configuration files.
+     *
+     * @param array        $data      The current data.
+     * @param array|object $values    The new replacement values.
+     * @param array        &$imported The list of imported resources.
+     *
+     * @return array The data merged with the imported resources.
+     *
+     * @throws LogicException If a circular reference is detected.
+     */
+    public function import(array $data, $values = null, array &$imported = array())
+    {
+        if (false === isset($data['imports'])) {
+            return $data;
+        }
+
+        $imports = $data['imports'];
+
+        unset($data['imports']);
+
+        foreach ($imports as $resource) {
+            $data = array_merge(
+                $data,
+                $this->get($resource, $values, $imported)
             );
         }
 

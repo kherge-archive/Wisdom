@@ -141,6 +141,49 @@ YAML
     /**
      * @depends testGet
      */
+    public function testGetImport()
+    {
+        unlink($dir = tempnam(sys_get_temp_dir(), 'wis'));
+        mkdir($dir);
+
+        file_put_contents($dir . '/a.yml', <<<YAML
+imports:
+    - b.yml
+
+a_value:
+    - 012
+YAML
+        );
+
+        file_put_contents($dir . '/b.yml', <<<YAML
+imports:
+    - c.yml
+
+a_value: 345
+b_value: 678
+YAML
+        );
+
+        file_put_contents($dir . '/c.yml', <<<YAML
+a_value: 901
+c_value: 234
+YAML
+        );
+
+        $wisdom = new Wisdom($dir);
+        $wisdom->addLoader(new YAML());
+        $wisdom->setCache($dir);
+
+        $result = $wisdom->get('a.yml');
+
+        $this->assertEquals(901, $result['a_value']);
+        $this->assertEquals(678, $result['b_value']);
+        $this->assertEquals(234, $result['c_value']);
+    }
+
+    /**
+     * @depends testGet
+     */
     public function testGetObject()
     {
         unlink($dir = tempnam(sys_get_temp_dir(), 'wis'));
@@ -180,6 +223,34 @@ YAML
         $this->assertSame(array('rand' => $y), $wisdom->get('test.yml', $b));
         $this->assertEquals($x, $a['rand']);
         $this->assertEquals($y, $b['rand']);
+    }
+
+    /**
+     * @expectedException LogicException
+     * @expectedExceptionMessage Circular dependency detected for:
+     */
+    public function testGetCircularDependency()
+    {
+        unlink($dir = tempnam(sys_get_temp_dir(), 'wis'));
+        mkdir($dir);
+
+        file_put_contents($dir . '/a.yml', <<<YAML
+imports:
+    - b.yml
+YAML
+        );
+
+        file_put_contents($dir . '/b.yml', <<<YAML
+imports:
+    - a.yml
+YAML
+        );
+
+        $wisdom = new Wisdom($dir);
+        $wisdom->addLoader(new YAML());
+        $wisdom->setCache($dir);
+
+        $result = $wisdom->get('a.yml');
     }
 
     /**
