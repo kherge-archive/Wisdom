@@ -209,7 +209,7 @@ class Wisdom
         unset($data['imports']);
 
         foreach ($imports as $resource) {
-            $data = array_replace(
+            $data = array_replace_recursive(
                 $this->get($resource, $values, $imported),
                 $data
             );
