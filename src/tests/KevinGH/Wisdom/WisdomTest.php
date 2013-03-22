@@ -264,26 +264,32 @@ YAML
         $wisdom->get(null, true);
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage The file "./test.yml" does not exist (in: ).
-     */
     public function testGetBadFile()
     {
         $wisdom = new Wisdom;
 
+        $this->setExpectedException(
+            'InvalidArgumentException',
+            'The file ".'
+                . DIRECTORY_SEPARATOR
+                . 'test.yml" does not exist (in: ).'
+        );
+
         $wisdom->get('test.yml');
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage The file "./test.test.yml" does not exist (in: ).
-     */
     public function testGetBadFileNested()
     {
         $wisdom = new Wisdom;
 
         $wisdom->setPrefix('test.');
+
+        $this->setExpectedException(
+            'InvalidArgumentException',
+            'The file ".'
+                . DIRECTORY_SEPARATOR
+                . 'test.test.yml" does not exist (in: ).'
+        );
 
         $wisdom->get('test.yml');
     }
