@@ -13,17 +13,17 @@
 
     "require": {
         "php": ">=5.3.3",
-        "symfony/config": "2.1.*"
+        "symfony/config": "~2.1"
     },
-    
+
     "require-dev": {
         "silex/silex": "@dev",
-        "symfony/yaml": "2.1.*"
+        "symfony/yaml": "~2.1"
     },
-    
+
     "suggest": {
-        "ext-json": "*",
-        "symfony/yaml": "2.1.*"
+        "ext-json": "For parsing JSON files.",
+        "symfony/yaml": "For parsing YAML files."
     },
 
     "autoload": {
