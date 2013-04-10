@@ -1,5 +1,7 @@
 # Wisdom
 
+> This project has been deprecated in favor of [Wise](https://github.com/herrera-io/php-wise). You can find the Silex service provider for Wise [here](https://github.com/herrera-io/php-silex-wise). If you would like to take over development of this project, please email me.
+
 [![Build Status](https://secure.travis-ci.org/kherge/Wisdom.png?branch=master)](http://travis-ci.org/kherge/Wisdom)
 
 Wisdom uses the Symfony Config component to load configuration settings from files.
